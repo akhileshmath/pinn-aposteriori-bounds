@@ -1,0 +1,7 @@
+\section{Conclusion}\label{sec:conclusion}
+
+We have developed a reproducible paper-ready presentation of a validated residual-based a posteriori estimator for PINN solutions of coercive elliptic PDEs. The estimator combines an interior $H^{-1}$ residual norm with a harmonic lifting term for the soft Dirichlet boundary mismatch. The resulting benchmark suite confirms that the method is reliable and reasonably sharp across smooth, heterogeneous, and singular settings.
+
+The numerical evidence supports two central conclusions. First, residual-only monitoring is not enough for PINNs with soft boundary enforcement: the lifting term is essential and is the dominant component of the estimate in all validated benchmarks. Second, singular geometries require geometric consistency across all evaluation layers. For the L-shaped benchmark, aligning the true-energy reference, dual norm, and lifting computation on the same fitted geometry was necessary to recover a trustworthy effectivity range.
+
+The current repository should therefore be viewed as a stable baseline for further work on certified scientific machine learning for elliptic problems. Natural next steps include more extensive architecture studies, adaptive collocation driven by the estimator, and extension to time-dependent or parametric settings.

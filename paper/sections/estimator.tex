@@ -1,0 +1,41 @@
+\section{Residual-Based Estimator}\label{sec:estimator}
+
+The estimator is based on the decomposition of the error into an interior residual term and a boundary lifting term. For a PINN approximation $\uhat$, define the strong residual
+\[
+R = f + \divop(a \gradop \uhat).
+\]
+Let $w$ solve the harmonic lifting problem
+\[
+-\Delta w = 0 \quad \text{in } \Omega,
+\qquad
+w = g - \uhat \quad \text{on } \partial\Omega.
+\]
+Then the validated estimator takes the form
+\begin{equation}
+\label{eq:main-estimator}
+\norm{u-\uhat}_{H^1_0(\Omega)}
+\leq
+\frac{1}{\alpha}\norm{R}_{H^{-1}(\Omega)} + \norm{\gradop w}_{L^2(\Omega)}.
+\end{equation}
+
+\subsection{Interior dual norm}
+
+The $H^{-1}$ dual norm is realized through the Riesz representer. Given the residual functional, find $\psi \in H^1_0(\Omega)$ such that
+\[
+\int_\Omega \gradop \psi \cdot \gradop v \, dx = \inner{R}{v}
+\qquad
+\forall v \in H^1_0(\Omega).
+\]
+Then
+\[
+\norm{R}_{H^{-1}(\Omega)} = \norm{\gradop \psi}_{L^2(\Omega)}.
+\]
+For the unit-square benchmarks, the code evaluates this quantity using a Discrete Sine Transform diagonalization of the discrete Laplacian. For the L-shaped benchmark, the dual problem is discretized on a fitted triangular mesh consistent with the domain geometry.
+
+\subsection{Boundary lifting}
+
+The harmonic lifting term is indispensable because the PINN uses soft Dirichlet enforcement. Even when the interior residual is small, a boundary mismatch can dominate the true energy error. This is observed consistently in the validated experiments and is made explicit by the ablation study in \Cref{sec:experiments}.
+
+\subsection{Validation margin}
+
+The reported estimate is produced on a sequence of mesh refinements. The final quantity includes a refinement-based discretization margin derived from successive estimator values. This margin is conservative and is designed to preserve reliability in the presence of mild non-monotonicity. The estimator, dual norm, and energy evaluation are frozen in the validated baseline; the present paper uses these validated values unchanged.

@@ -1,0 +1,68 @@
+\section{Experiments}\label{sec:experiments}
+
+This section reports the validated benchmark suite together with the paper-artifact ablation and convergence studies. All numerical values are taken from the frozen validated baseline and the reproducible paper-artifact script.
+
+\subsection{Validated benchmark summary}
+
+The central benchmark summary is reported in \Cref{tab:benchmark-results}. Across the three supported benchmarks, the estimator remains reliable with effectivities between $1.05$ and $1.31$.
+
+\begin{table}[H]
+\centering
+\caption{Validated benchmark results. The estimator remains reliable across smooth, heterogeneous, and singular settings.}
+\label{tab:benchmark-results}
+\input{tables/benchmark_results.tex}
+\end{table}
+
+\subsection{Effectivity and ablation}
+
+\Cref{fig:effectivity-benchmark} shows the benchmark-level effectivity indices. The sharpest performance is observed on the two unit-square problems, while the L-shaped singular benchmark shows a moderate but still acceptable loss of efficiency.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{effectivity_benchmarks.pdf}
+\caption{Validated effectivity indices for the three supported benchmarks. All effectivities remain above one, confirming reliability.}
+\label{fig:effectivity-benchmark}
+\end{figure}
+
+The ablation study in \Cref{fig:ablation-study} and \Cref{tab:ablation-results} isolates the contributions of the residual-only term, the lifting-only term, and the full estimator. The residual-only estimate is far below the full estimate in every benchmark. The lifting term dominates the estimate throughout the suite, confirming that soft boundary enforcement introduces a boundary-driven error component that must be included explicitly in any reliable PINN certification method.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{ablation_study.pdf}
+\caption{Ablation study comparing residual-only, lifting-only, and full estimator values against the true energy error. The lifting term is the dominant contribution in all validated benchmarks.}
+\label{fig:ablation-study}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Estimator ablation results. The residual-only term is not sufficient for reliability, while the full estimator remains safely above the true energy error.}
+\label{tab:ablation-results}
+\input{tables/ablation_results.tex}
+\end{table}
+
+\subsection{Mesh convergence diagnostics}
+
+To complement the final validated values, the paper-artifact pipeline evaluates each trained solution on a four-level estimator mesh ladder. The corresponding error curves and effectivity curves are shown in \Cref{fig:convergence-errors,fig:convergence-effectivity}. The true-energy and estimated-error curves are displayed on log--log axes, and the effectivity curves remain close to one across the refinement sequence.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{convergence_errors.pdf}
+\caption{Four-level mesh convergence study for the true energy error and the estimated error. The trained PINN is held fixed while the estimator mesh is refined.}
+\label{fig:convergence-errors}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{convergence_effectivity.pdf}
+\caption{Effectivity as a function of estimator mesh size on the four-level refinement ladder. The curves remain in the reliable regime and expose only mild benchmark-dependent non-monotonicity.}
+\label{fig:convergence-effectivity}
+\end{figure}
+
+\subsection{Interpretation}
+
+Three conclusions follow from the validated numerical study:
+\begin{enumerate}[leftmargin=*]
+\item The full estimator is reliable and practically sharp across all supported coercive elliptic benchmarks.
+\item Residual-only certification is inadequate: it systematically underrepresents the total error and misses the dominant boundary-driven contribution.
+\item The singular L-shaped benchmark is more demanding than the smooth cases, but once geometry-consistent discretizations are used for the lifting, dual norm, and true-energy reference, the estimator remains both reliable and moderately efficient.
+\end{enumerate}

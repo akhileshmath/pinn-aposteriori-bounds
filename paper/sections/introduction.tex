@@ -1,0 +1,26 @@
+\section{Introduction}
+
+Physics-informed neural networks (PINNs) have become a standard neural approach for solving partial differential equations by minimizing a loss that combines a PDE residual term with a boundary or initial-condition penalty \cite{raissi2019physics,karniadakis2021physics}. Their attraction lies in flexibility: the approximation space is not tied to a mesh, automatic differentiation gives exact derivatives of the neural surrogate, and the same architecture can be reused across many PDE classes. The central weakness is certification. A low training loss does not imply a small approximation error in a mathematically meaningful norm.
+
+For elliptic PDEs, the natural norm is the energy norm induced by the underlying variational problem. In classical finite element analysis, a posteriori estimators provide computable bounds of the form
+\[
+\norm{u-u_h}_{H^1_0(\Omega)} \leq C_{\mathrm{rel}} \eta(u_h),
+\]
+with $\eta(u_h)$ assembled from local residual information \cite{ainsworth2000posteriori,verfurth2013posteriori}. This gives both a reliability guarantee and an operational diagnostic for adaptive refinement. An analogous tool is largely missing in practical PINN workflows, where the residual is often monitored only in an $L^2$ training sense and the boundary penalty is interpreted heuristically.
+
+The aim of this paper is to provide a computable residual-based estimator for coercive elliptic PINN solutions with soft Dirichlet enforcement and to demonstrate that it behaves as a genuine certification tool. The key point is that soft boundary enforcement introduces a boundary-driven error component that is invisible to a residual-only estimate. The estimator must therefore combine an interior residual dual norm with a harmonic lifting term for the boundary mismatch.
+
+The present repository now contains a validated baseline with effectivities between $1.05$ and $1.31$ on three supported benchmarks: a smooth Poisson problem, a variable-coefficient diffusion problem, and an L-shaped singular benchmark. These numerical results motivate the main message of the paper: reliable a posteriori certification for PINNs is possible, but only when the boundary contribution is handled explicitly.
+
+Our contributions are:
+\begin{enumerate}[leftmargin=*]
+\item a reproducible computational realization of the estimator
+\[
+\norm{u-\uhat}_{H^1_0(\Omega)} \leq \frac{1}{\alpha}\norm{R}_{H^{-1}(\Omega)} + \norm{\gradop w}_{L^2(\Omega)},
+\]
+where $R = f + \divop(a \gradop \uhat)$ and $w$ is the harmonic lifting of the boundary mismatch;
+\item a fitted-domain treatment for the L-shaped benchmark that aligns the true-energy reference, dual norm, and lifting computation on the same geometry;
+\item a paper-ready experimental study including ablation, convergence diagnostics, and effectivity tables derived from the validated benchmark suite.
+\end{enumerate}
+
+The rest of the paper is organized as follows. \Cref{sec:methodology} introduces the PDE setting and the PINN approximation. \Cref{sec:estimator} states the estimator and its computational realization. \Cref{sec:experiments} reports the validated results, convergence studies, and ablation analysis. \Cref{sec:conclusion} summarizes the main findings and the current scope of the method.

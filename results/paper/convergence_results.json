@@ -1,0 +1,160 @@
+{
+  "convergence": [
+    {
+      "benchmark": "Poisson (smooth)",
+      "key": "poisson",
+      "mesh_ladder": [
+        48.0,
+        96.0,
+        192.0,
+        384.0
+      ],
+      "entries": [
+        {
+          "mesh_size": 48.0,
+          "true_error_energy": 0.0011759608168971387,
+          "true_error_l2": 5.896802896741004e-05,
+          "estimated_error_energy": 0.0012935387765178252,
+          "effectivity": 1.099984589563898,
+          "residual_contribution": 3.2628959218001334e-05,
+          "boundary_contribution": 0.001260909817299824,
+          "training_loss": 1.117456122301519e-06
+        },
+        {
+          "mesh_size": 96.0,
+          "true_error_energy": 0.0011814880961959616,
+          "true_error_l2": 5.929110218549534e-05,
+          "estimated_error_energy": 0.001255624273905592,
+          "effectivity": 1.0627481376649726,
+          "residual_contribution": 3.254482506024549e-05,
+          "boundary_contribution": 0.0012230794488453467,
+          "training_loss": 1.117456122301519e-06
+        },
+        {
+          "mesh_size": 192.0,
+          "true_error_energy": 0.001182880791468525,
+          "true_error_l2": 5.937002266992441e-05,
+          "estimated_error_energy": 0.0012356568917328103,
+          "effectivity": 1.0446165840589607,
+          "residual_contribution": 3.253044193409094e-05,
+          "boundary_contribution": 0.0012031264497987194,
+          "training_loss": 1.117456122301519e-06
+        },
+        {
+          "mesh_size": 384.0,
+          "true_error_energy": 0.0011832252101565647,
+          "true_error_l2": 5.938957651419234e-05,
+          "estimated_error_energy": 0.0012257403081941474,
+          "effectivity": 1.035931534988134,
+          "residual_contribution": 3.252750860451452e-05,
+          "boundary_contribution": 0.001193212799589633,
+          "training_loss": 1.117456122301519e-06
+        }
+      ]
+    },
+    {
+      "benchmark": "Variable coefficient diffusion",
+      "key": "variable_coefficient",
+      "mesh_ladder": [
+        48.0,
+        96.0,
+        192.0,
+        384.0
+      ],
+      "entries": [
+        {
+          "mesh_size": 48.0,
+          "true_error_energy": 0.0024284064019024607,
+          "true_error_l2": 0.00012908106987437456,
+          "estimated_error_energy": 0.002754377048656902,
+          "effectivity": 1.134232328863517,
+          "residual_contribution": 0.00011289052151045067,
+          "boundary_contribution": 0.0026414865271464512,
+          "training_loss": 4.117083790333709e-06
+        },
+        {
+          "mesh_size": 96.0,
+          "true_error_energy": 0.002440013890512118,
+          "true_error_l2": 0.0001297321667827083,
+          "estimated_error_energy": 0.0026560824370021746,
+          "effectivity": 1.0885521788749766,
+          "residual_contribution": 0.00011251714573417324,
+          "boundary_contribution": 0.0025435652912680013,
+          "training_loss": 4.117083790333709e-06
+        },
+        {
+          "mesh_size": 192.0,
+          "true_error_energy": 0.0024429275848054668,
+          "true_error_l2": 0.00012988945837989736,
+          "estimated_error_energy": 0.002605950621952799,
+          "effectivity": 1.0667326523149125,
+          "residual_contribution": 0.00011247375973438611,
+          "boundary_contribution": 0.0024934768622184127,
+          "training_loss": 4.117083790333709e-06
+        },
+        {
+          "mesh_size": 384.0,
+          "true_error_energy": 0.0024436566237132445,
+          "true_error_l2": 0.00012993155650776648,
+          "estimated_error_energy": 0.0025807487528590016,
+          "effectivity": 1.0561012246219108,
+          "residual_contribution": 0.00011247505252152331,
+          "boundary_contribution": 0.002468273700337478,
+          "training_loss": 4.117083790333709e-06
+        }
+      ]
+    },
+    {
+      "benchmark": "L-shaped domain singularity",
+      "key": "l_shaped",
+      "mesh_ladder": [
+        40.0,
+        80.0,
+        160.0,
+        320.0
+      ],
+      "entries": [
+        {
+          "mesh_size": 40.0,
+          "true_error_energy": 0.08175533592341482,
+          "true_error_l2": 0.002050487597290039,
+          "estimated_error_energy": 0.08650454918211953,
+          "effectivity": 1.0580905601458672,
+          "residual_contribution": 0.004429022759727945,
+          "boundary_contribution": 0.08207552642239158,
+          "training_loss": 5.9442729252623394e-05
+        },
+        {
+          "mesh_size": 80.0,
+          "true_error_energy": 0.07191709923840615,
+          "true_error_l2": 0.001852321565467922,
+          "estimated_error_energy": 0.07271819261450935,
+          "effectivity": 1.0111391224699922,
+          "residual_contribution": 0.002633016833884089,
+          "boundary_contribution": 0.07008517578062526,
+          "training_loss": 5.9442729252623394e-05
+        },
+        {
+          "mesh_size": 160.0,
+          "true_error_energy": 0.06411182340122536,
+          "true_error_l2": 0.0017786643353620171,
+          "estimated_error_energy": 0.06569341605987143,
+          "effectivity": 1.0246692821189647,
+          "residual_contribution": 0.0024247938579238485,
+          "boundary_contribution": 0.06326862220194758,
+          "training_loss": 5.9442729252623394e-05
+        },
+        {
+          "mesh_size": 320.0,
+          "true_error_energy": 0.060365583439091125,
+          "true_error_l2": 0.0017627618545059624,
+          "estimated_error_energy": 0.06243293383628354,
+          "effectivity": 1.0342471699835116,
+          "residual_contribution": 0.0024520102871745057,
+          "boundary_contribution": 0.059980923549109035,
+          "training_loss": 5.9442729252623394e-05
+        }
+      ]
+    }
+  ]
+}

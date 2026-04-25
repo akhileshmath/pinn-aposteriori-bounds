@@ -1,0 +1,37 @@
+\section{Methodology}\label{sec:methodology}
+
+We consider second-order coercive elliptic problems on a bounded Lipschitz domain $\Omega \subset \R^2$:
+\begin{equation}
+\label{eq:model-problem}
+\begin{aligned}
+-\divop(a(\bm{x}) \gradop u) &= f \qquad &&\text{in } \Omega,\\
+u &= g \qquad &&\text{on } \partial\Omega.
+\end{aligned}
+\end{equation}
+The diffusion coefficient is assumed uniformly elliptic,
+\[
+0 < \alpha \leq a(\bm{x}) \leq \beta < \infty \quad \text{a.e. in } \Omega.
+\]
+The energy norm is identified with the $H^1_0$ seminorm:
+\[
+\norm{v}_{H^1_0(\Omega)} = \norm{\gradop v}_{L^2(\Omega)}.
+\]
+
+Let $\uhat$ be a PINN approximation trained by minimizing a soft-constraint loss
+\[
+\mathcal{L}(\theta) = w_r \mathcal{L}_{\mathrm{res}}(\theta) + w_b \mathcal{L}_{\mathrm{bc}}(\theta),
+\]
+where $\mathcal{L}_{\mathrm{res}}$ is the empirical interior residual loss and $\mathcal{L}_{\mathrm{bc}}$ is the empirical Dirichlet penalty. The boundary condition is therefore enforced only weakly, and the approximation error contains both an interior residual component and a boundary mismatch component.
+
+The codebase uses a fixed architecture and training configuration per benchmark. These choices are intentionally frozen in the validated baseline: the goal of the present paper-preparation branch is not to optimize architectures but to present a clean and reproducible certification pipeline.
+
+\subsection{Benchmarks}
+
+The supported benchmark suite contains three coercive elliptic test problems:
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Poisson (smooth).} A manufactured solution on the unit square with homogeneous Dirichlet data.
+\item \textbf{Variable-coefficient diffusion.} A heterogeneous diffusion problem on the unit square with manufactured exact solution.
+\item \textbf{L-shaped singularity.} A Laplace problem on a non-convex L-shaped domain with the classical re-entrant corner singularity $u(r,\theta)=r^{2/3}\sin(2\theta/3)$.
+\end{enumerate}
+
+The first two benchmarks validate the estimator in smooth and heterogeneous settings. The third benchmark probes the singular-domain regime where geometry handling is essential for a trustworthy energy reference and boundary lifting computation.
