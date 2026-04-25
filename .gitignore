@@ -1,0 +1,143 @@
+# Python bytecode and cache directories
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Native extensions and compiled artifacts
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# Python packaging and build outputs
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg
+MANIFEST
+pip-wheel-metadata/
+
+# Installer and dependency manager logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Test, type-check, lint, and coverage caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+.python-version
+pinn_env/
+
+# Notebook and interactive session artifacts
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.iml
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Local project tooling
+.vincent/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Project runtime logs and local debugging output
+*.log
+*.out
+*.err
+
+# Project-generated experiment outputs
+results/*.json
+results/*.csv
+results/*.npz
+results/*.npy
+results/*.pt
+results/*.pth
+results/*.pkl
+results/*.pickle
+results/checkpoints/
+checkpoints/
+*.pt
+*.pth
+
+# Generated figures and rendered media
+figures/*.png
+figures/*.pdf
+figures/*.jpg
+figures/*.jpeg
+figures/*.svg
+figures/*.eps
+
+# LaTeX auxiliary and build files for paper/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.fmt
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.xdv
+*.dvi
+*.ps
+*.pdf
+latexmkrc
+
+# Local environment files and secrets
+.env
+.env.*
+*.local
+
