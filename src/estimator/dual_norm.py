@@ -6,6 +6,8 @@ from scipy.fft import dstn, idstn
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import cg
 
+from .lifting import _build_l_shaped_triangular_mesh, _triangle_shape_gradients, _triangle_stiffness
+
 
 def compute_dual_norm(
     solver,
@@ -58,42 +60,50 @@ def _dual_norm_unit_square(solver, n_mesh: int, stabilization_eps: float) -> flo
 
 
 def _dual_norm_l_shaped(solver, n_mesh: int, stabilization_eps: float) -> float:
-    h = 2.0 / (n_mesh + 1)
-    x = np.linspace(-1.0 + h, 1.0 - h, n_mesh)
-    y = np.linspace(-1.0 + h, 1.0 - h, n_mesh)
-    X, Y = np.meshgrid(x, y)
-    mask = ~((X > 0.0) & (Y < 0.0))
-    interior_idx = np.where(mask.ravel())[0]
+    nodes, triangles, boundary_nodes = _build_l_shaped_triangular_mesh(n_mesh)
+    residual_values = _evaluate_residual(solver, nodes)
 
-    mapping = -np.ones(n_mesh * n_mesh, dtype=int)
-    mapping[interior_idx] = np.arange(len(interior_idx))
+    n_nodes = nodes.shape[0]
+    boundary_mask = np.zeros(n_nodes, dtype=bool)
+    boundary_mask[boundary_nodes] = True
+    interior_nodes = np.flatnonzero(~boundary_mask)
 
     rows = []
     cols = []
     vals = []
-    for local_idx, global_idx in enumerate(interior_idx):
-        i = global_idx // n_mesh
-        j = global_idx % n_mesh
-        rows.append(local_idx)
-        cols.append(local_idx)
-        vals.append(4.0 / h**2 + stabilization_eps)
-        for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            ni = i + di
-            nj = j + dj
-            if 0 <= ni < n_mesh and 0 <= nj < n_mesh:
-                neighbor_global = ni * n_mesh + nj
-                neighbor_local = mapping[neighbor_global]
-                if neighbor_local >= 0:
-                    rows.append(local_idx)
-                    cols.append(neighbor_local)
-                    vals.append(-1.0 / h**2)
+    load = np.zeros(n_nodes, dtype=np.float64)
 
-    system = csr_matrix((vals, (rows, cols)), shape=(len(interior_idx), len(interior_idx)))
-    points = np.stack([X.ravel()[interior_idx], Y.ravel()[interior_idx]], axis=1)
-    residual_values = _evaluate_residual(solver, points)
-    psi, info = cg(system, residual_values, rtol=1e-10, atol=0.0, maxiter=5000)
+    mass_template = np.array(
+        [
+            [2.0, 1.0, 1.0],
+            [1.0, 2.0, 1.0],
+            [1.0, 1.0, 2.0],
+        ],
+        dtype=np.float64,
+    )
+
+    for tri in triangles:
+        tri_nodes = nodes[tri]
+        element_stiffness = _triangle_stiffness(tri_nodes)
+        area, _ = _triangle_shape_gradients(tri_nodes)
+        element_mass = (area / 12.0) * mass_template
+        element_load = element_mass @ residual_values[tri]
+
+        for a in range(3):
+            load[tri[a]] += element_load[a]
+            for b in range(3):
+                rows.append(tri[a])
+                cols.append(tri[b])
+                vals.append(element_stiffness[a, b])
+
+    system = csr_matrix((vals, (rows, cols)), shape=(n_nodes, n_nodes))
+    interior_matrix = system[interior_nodes][:, interior_nodes].tolil()
+    interior_matrix.setdiag(interior_matrix.diagonal() + stabilization_eps)
+    rhs = load[interior_nodes]
+
+    psi, info = cg(interior_matrix.tocsr(), rhs, rtol=1e-10, atol=0.0, maxiter=5000)
     if info != 0:
         raise RuntimeError(f"L-shaped dual solve did not converge (info={info})")
 
-    energy = np.dot(residual_values, psi) * h**2
+    energy = np.dot(rhs, psi)
     return np.sqrt(max(float(energy), 0.0))

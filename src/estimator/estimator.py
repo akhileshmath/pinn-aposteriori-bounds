@@ -108,7 +108,7 @@ class ValidatedEstimator:
         label: str,
     ) -> tuple[float, float]:
         diff = abs(current_value - previous_value)
-        if current_value <= previous_value:
+        if current_value <= previous_value + self.effectivity_tol:
             margin = diff / 3.0
             return current_value + margin, margin
 
@@ -191,7 +191,7 @@ class ValidatedEstimator:
                 effectivity = estimated / true_energy
 
                 previous_estimate = previous["estimate"]
-                if current_estimate > previous_estimate:
+                if current_estimate > previous_estimate + self.effectivity_tol:
                     warnings.warn(
                         (
                             f"Total estimate increased under refinement "
