@@ -101,7 +101,38 @@ class ValidatedEstimator:
         exact = self.benchmark.boundary_condition(x_b)
         return float(torch.sqrt(torch.mean((pred - exact) ** 2)).item())
 
+    def _refinement_upper_bound(
+        self,
+        current_value: float,
+        previous_value: float,
+        label: str,
+    ) -> tuple[float, float]:
+        diff = abs(current_value - previous_value)
+        if current_value <= previous_value:
+            margin = diff / 3.0
+            return current_value + margin, margin
+
+        warnings.warn(
+            (
+                f"{label} estimate increased under refinement "
+                f"({previous_value:.6e} -> {current_value:.6e}). "
+                "Using a conservative non-monotone fallback bound."
+            ),
+            stacklevel=3,
+        )
+        margin = diff
+        return max(current_value, previous_value) + margin, margin
+
     def evaluate(self, training_loss: float) -> ErrorResult:
+        """
+        Evaluate the validated estimator and compare it with the true energy error.
+
+        The reported estimate is a computable upper bound under the assumption that
+        the discrete lifting and dual norm computations converge from above as h->0.
+        The Richardson correction (1/3)*|eta_h - eta_{h/2}| is added as a
+        discretization margin. If the estimates are not monotonically decreasing,
+        a convergence warning is raised and the bound may not be rigorous.
+        """
         alpha = float(self.benchmark.coercivity_constant)
         true_energy, true_l2 = self.compute_true_errors()
         residual_l2 = self.compute_residual_l2_norm()
@@ -145,15 +176,35 @@ class ValidatedEstimator:
 
             if len(mesh_history) >= 2:
                 previous = mesh_history[-2]
-                residual_contribution = current_residual_contribution + abs(
-                    current_residual_contribution - previous["residual_contribution"]
+                residual_contribution, residual_margin = self._refinement_upper_bound(
+                    current_residual_contribution,
+                    previous["residual_contribution"],
+                    "Residual contribution",
                 )
-                boundary_contribution = current_boundary_contribution + abs(
-                    current_boundary_contribution - previous["boundary_contribution"]
+                boundary_contribution, boundary_margin = self._refinement_upper_bound(
+                    current_boundary_contribution,
+                    previous["boundary_contribution"],
+                    "Boundary contribution",
                 )
-                discretization_margin = abs(current_estimate - previous["estimate"])
                 estimated = residual_contribution + boundary_contribution
+                discretization_margin = residual_margin + boundary_margin
                 effectivity = estimated / true_energy
+
+                previous_estimate = previous["estimate"]
+                if current_estimate > previous_estimate:
+                    warnings.warn(
+                        (
+                            f"Total estimate increased under refinement "
+                            f"({previous_estimate:.6e} -> {current_estimate:.6e}). "
+                            "The validation margin is conservative and may not be rigorous."
+                        ),
+                        stacklevel=2,
+                    )
+                else:
+                    total_margin = (previous_estimate - current_estimate) / 3.0
+                    discretization_margin = max(discretization_margin, total_margin)
+                    estimated = max(estimated, current_estimate + total_margin)
+                    effectivity = estimated / true_energy
             else:
                 residual_contribution = current_residual_contribution
                 boundary_contribution = current_boundary_contribution
