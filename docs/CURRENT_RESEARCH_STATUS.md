@@ -3,6 +3,7 @@
 ## Why This File Exists
 
 This document separates three things that were previously mixed together:
+
 - the long-term paper ambition
 - the legacy experiment evidence
 - the current validated repository scope
@@ -14,6 +15,7 @@ That separation is important if the project is to look like a serious research c
 The historical run log in [exp_log.md](D:/Work/PHD-2026/Project/project-2/pinn-error-bounds/exp_log.md) captures the main reason the repository needed refactoring.
 
 The old pipeline showed:
+
 - smooth Poisson and variable-coefficient cases with effectivities below `1`
 - one acceptable L-shaped result and one catastrophic one
 - convection-dominated cases with completely invalid effectivities
@@ -29,6 +31,7 @@ The current supported repository validates the following estimator structure:
 \]
 
 The current codebase provides:
+
 - a single supported entry point: `python experiments/run.py`
 - a single supported implementation path under `src/`
 - explicit effectivity validation with failure on `η < 1`
@@ -39,16 +42,19 @@ The current codebase provides:
 ## What Is Currently In Scope
 
 Validated benchmark scope:
+
 - Poisson on the unit square
 - Variable-coefficient coercive diffusion
 - L-shaped coercive Laplace benchmark
 
 Archived from the validated scope:
+
 - convection-diffusion and other unsupported operator classes
 
 ## What Is Still Not Fully Settled
 
 The repository is cleaner and more defensible now, but some research milestones still remain:
+
 - full end-to-end validated runs across the supported benchmark suite must be collected and preserved
 - the theory note in the paper must explain the energy norm and boundary lifting cleanly
 - the numerical safety factor used for conservative validation must be documented explicitly in the paper

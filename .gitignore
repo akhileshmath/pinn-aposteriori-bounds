@@ -1,38 +1,44 @@
-# Python bytecode and cache directories
+# ==============================
+# Python bytecode & cache
+# ==============================
 __pycache__/
 *.py[cod]
 *$py.class
+.vincent/
 
-# Native extensions and compiled artifacts
+# ==============================
+# Native / compiled extensions
+# ==============================
 *.so
 *.pyd
 *.dll
 *.dylib
 
-# Python packaging and build outputs
+# ==============================
+# Build & packaging
+# ==============================
 .Python
 build/
 dist/
-downloads/
-eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
 *.egg-info/
 *.egg
-MANIFEST
 pip-wheel-metadata/
+MANIFEST
 
-# Installer and dependency manager logs
-pip-log.txt
-pip-delete-this-directory.txt
+# ==============================
+# Virtual environments
+# ==============================
+.venv/
+venv/
+env/
+ENV/
+.python-version
+pinn_env/
 
-# Test, type-check, lint, and coverage caches
+# ==============================
+# Testing / lint / coverage
+# ==============================
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -45,21 +51,16 @@ pip-delete-this-directory.txt
 coverage.xml
 htmlcov/
 
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
-.env/
-.python-version
-pinn_env/
-
-# Notebook and interactive session artifacts
+# ==============================
+# Jupyter / IPython
+# ==============================
 .ipynb_checkpoints/
 profile_default/
 ipython_config.py
 
-# IDE and editor settings
+# ==============================
+# IDE / Editors
+# ==============================
 .vscode/
 .idea/
 *.iml
@@ -71,42 +72,50 @@ ipython_config.py
 *.swo
 *~
 
-# Local project tooling
-.vincent/
-
-# Operating system files
+# ==============================
+# OS files
+# ==============================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# Project runtime logs and local debugging output
+# ==============================
+# Logs
+# ==============================
 *.log
 *.out
 *.err
 
-# Project-generated experiment outputs
-results/*.json
-results/*.csv
-results/*.npz
-results/*.npy
-results/*.pt
-results/*.pth
-results/*.pkl
-results/*.pickle
-results/checkpoints/
+# ==============================
+# Experiment outputs
+# ==============================
 checkpoints/
 *.pt
 *.pth
+*.npy
+*.npz
+*.pkl
+*.pickle
 
-# Generated figures and rendered media
-figures/*.png
-figures/*.pdf
-figures/*.jpg
-figures/*.jpeg
-figures/*.svg
-figures/*.eps
+# Keep validated results if needed
+!results/validated_results.json
+!results/README.md
 
-# LaTeX auxiliary and build files for paper/
+# ==============================
+# Figures (generated)
+# ==============================
+figures/**/*.png
+figures/**/*.jpg
+figures/**/*.jpeg
+figures/**/*.svg
+figures/**/*.eps
+
+# ⚠️ IMPORTANT: Keep PDFs for paper figures
+!figures/**/*.pdf
+
+# ==============================
+# LaTeX (paper/)
+# ==============================
 *.aux
 *.bbl
 *.bcf
@@ -122,7 +131,6 @@ figures/*.eps
 *.ind
 *.ist
 *.lof
-*.log
 *.lot
 *.nav
 *.out
@@ -133,11 +141,13 @@ figures/*.eps
 *.xdv
 *.dvi
 *.ps
-*.pdf
-latexmkrc
 
-# Local environment files and secrets
+# ⚠️ DO NOT ignore PDF (your paper!)
+# *.pdf  ❌ REMOVED
+
+# ==============================
+# Secrets / env
+# ==============================
 .env
 .env.*
 *.local
-

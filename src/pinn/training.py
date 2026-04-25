@@ -14,6 +14,8 @@ class TrainingConfig:
     n_boundary: int = 500
     w_r: float = 1.0
     w_b: float = 10.0
+    boundary_warmup_epochs: int = 0
+    boundary_warmup_weight: float = 10.0
     resample_every: int = 1000
     print_every: int = 1000
 
@@ -50,9 +52,15 @@ class Trainer:
                 x_r = self.solver.domain_sampler(self.config.n_collocation).to(self.solver.device)
                 x_b = self.solver.boundary_sampler(self.config.n_boundary).to(self.solver.device)
 
+            boundary_weight = (
+                self.config.boundary_warmup_weight
+                if epoch <= self.config.boundary_warmup_epochs
+                else self.config.w_b
+            )
+
             optimizer.zero_grad()
             total, residual, boundary = self.solver.compute_total_loss(
-                x_r, x_b, self.config.w_r, self.config.w_b
+                x_r, x_b, self.config.w_r, boundary_weight
             )
             total.backward()
             optimizer.step()

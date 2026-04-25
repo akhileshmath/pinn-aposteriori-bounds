@@ -58,6 +58,7 @@ def build_benchmark_configs():
                 print_every=1000,
             ),
             "mesh_size": 96,
+            "sampler": {},
         },
         "variable_coefficient": {
             "network": {
@@ -76,6 +77,7 @@ def build_benchmark_configs():
                 print_every=1600,
             ),
             "mesh_size": 96,
+            "sampler": {},
         },
         "l_shaped": {
             "network": {
@@ -94,12 +96,16 @@ def build_benchmark_configs():
                 print_every=1600,
             ),
             "mesh_size": 80,
+            "sampler": {},
         },
     }
 
 
 def run_single_experiment(benchmark, config, device: str, seed: int):
-    interior_sampler, boundary_sampler = get_domain_samplers(benchmark.domain)
+    interior_sampler, boundary_sampler = get_domain_samplers(
+        benchmark.domain,
+        config.get("sampler"),
+    )
     network = PINNNetwork(**config["network"])
     solver = PINNSolver(
         network=network,
