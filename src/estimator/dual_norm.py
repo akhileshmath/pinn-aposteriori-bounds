@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from scipy.fft import dstn, idstn
 from scipy.sparse import csr_matrix
-from scipy.sparse.linalg import cg
+from scipy.sparse.linalg import spsolve
 
 from .lifting import _build_l_shaped_triangular_mesh, _triangle_shape_gradients, _triangle_stiffness
 
@@ -101,9 +101,9 @@ def _dual_norm_l_shaped(solver, n_mesh: int, stabilization_eps: float) -> float:
     interior_matrix.setdiag(interior_matrix.diagonal() + stabilization_eps)
     rhs = load[interior_nodes]
 
-    psi, info = cg(interior_matrix.tocsr(), rhs, rtol=1e-10, atol=0.0, maxiter=5000)
-    if info != 0:
-        raise RuntimeError(f"L-shaped dual solve did not converge (info={info})")
+    psi = spsolve(interior_matrix.tocsr(), rhs)
+    if not np.all(np.isfinite(psi)):
+        raise RuntimeError("L-shaped dual solve produced non-finite values.")
 
     energy = np.dot(rhs, psi)
     return np.sqrt(max(float(energy), 0.0))

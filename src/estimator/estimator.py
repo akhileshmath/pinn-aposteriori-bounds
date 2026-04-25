@@ -8,6 +8,7 @@ import torch
 
 from .dual_norm import compute_dual_norm
 from .lifting import compute_boundary_lifting_norm
+from .lifting import _build_l_shaped_triangular_mesh, _triangle_shape_gradients
 from .quadrature import get_quadrature_points
 
 
@@ -63,6 +64,9 @@ class ValidatedEstimator:
         return np.random.default_rng(self.eval_seed + offset)
 
     def compute_true_errors(self, n_points: int = 50000):
+        if self.benchmark.domain == "l_shaped":
+            return self._compute_true_errors_l_shaped()
+
         points, weights, area = get_quadrature_points(
             self.benchmark.domain,
             n_points,
@@ -79,6 +83,37 @@ class ValidatedEstimator:
             w * torch.sum((grad_pred - grad_exact).pow(2), dim=1).to(torch.float64)
         ).item()
         return float(np.sqrt(max(h1_semi_sq, 0.0))), float(np.sqrt(max(l2_sq, 0.0)))
+
+    def _compute_true_errors_l_shaped(self):
+        reference_mesh = max(self.max_mesh_size, self.fem_mesh_size)
+        nodes, triangles, _ = _build_l_shaped_triangular_mesh(reference_mesh)
+        x_nodes = torch.tensor(nodes, dtype=torch.float32, device=self.solver.device)
+
+        u_pred, _ = self.solver.predict_with_gradient(x_nodes)
+        u_exact = self.benchmark.exact_solution(x_nodes).detach()
+        nodal_error = (u_pred - u_exact).reshape(-1).to(torch.float64).cpu().numpy()
+
+        energy_sq = 0.0
+        l2_sq = 0.0
+        mass_template = np.array(
+            [
+                [2.0, 1.0, 1.0],
+                [1.0, 2.0, 1.0],
+                [1.0, 1.0, 2.0],
+            ],
+            dtype=np.float64,
+        )
+
+        for tri in triangles:
+            tri_nodes = nodes[tri]
+            tri_error = nodal_error[tri]
+            area, gradients = _triangle_shape_gradients(tri_nodes)
+            grad_error = tri_error @ gradients
+            energy_sq += area * float(np.dot(grad_error, grad_error))
+            element_mass = (area / 12.0) * mass_template
+            l2_sq += float(tri_error @ element_mass @ tri_error)
+
+        return float(np.sqrt(max(energy_sq, 0.0))), float(np.sqrt(max(l2_sq, 0.0)))
 
     def compute_residual_l2_norm(self, n_points: int = 50000) -> float:
         points, weights, area = get_quadrature_points(
