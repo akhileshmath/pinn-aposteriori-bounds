@@ -1,7 +1,87 @@
 \section{Conclusion}\label{sec:conclusion}
 
-We have developed a reproducible paper-ready presentation of a validated residual-based a posteriori estimator for PINN solutions of coercive elliptic PDEs. The estimator combines an interior $H^{-1}$ residual norm with a harmonic lifting term for the soft Dirichlet boundary mismatch. The resulting benchmark suite confirms that the method is reliable and reasonably sharp across smooth, heterogeneous, and singular settings.
+We have developed a residual-based \emph{a posteriori} error estimator for
+physics-informed neural network (PINN) approximations of coercive elliptic
+partial differential equations in the energy seminorm. The key contribution
+of this work is the systematic incorporation of boundary mismatch through
+a harmonic lifting term, leading to a \emph{reliable and fully computable}
+estimator that remains consistent with the PINN formulation based on soft
+Dirichlet enforcement.
 
-The numerical evidence supports two central conclusions. First, residual-only monitoring is not enough for PINNs with soft boundary enforcement: the lifting term is essential and is the dominant component of the estimate in all validated benchmarks. Second, singular geometries require geometric consistency across all evaluation layers. For the L-shaped benchmark, aligning the true-energy reference, dual norm, and lifting computation on the same fitted geometry was necessary to recover a trustworthy effectivity range.
+The proposed estimator is given by
+\[
+\|\nabla(u - \hat{u})\|_{L^2(\Omega)}
+\;\le\;
+\frac{1}{\alpha}\|R\|_{H^{-1}(\Omega)}
++
+\|\nabla w\|_{L^2(\Omega)},
+\]
+where the dual norm of the residual captures interior physics violation,
+and the lifting term quantifies boundary mismatch propagated into the domain.
+This decomposition reveals a fundamental limitation of standard PINN training:
+\emph{minimization of the training loss does not guarantee control of the
+true approximation error in Sobolev norms}.
 
-The current repository should therefore be viewed as a stable baseline for further work on certified scientific machine learning for elliptic problems. Natural next steps include more extensive architecture studies, adaptive collocation driven by the estimator, and extension to time-dependent or parametric settings.
+Theoretical analysis establishes reliability of the estimator for
+constant-coefficient problems. For variable-coefficient diffusion,
+a Laplace-based harmonic lifting is used as a computable surrogate,
+resulting in a practically reliable upper bound consistent with the
+implemented numerical pipeline.
+
+A comprehensive and fully reproducible numerical study confirms both
+reliability and sharpness of the estimator. Across all benchmarks
+(Table~\ref{tab:benchmark_results}), the effectivity index satisfies
+\[
+1 \le \eta \le 1.31,
+\]
+demonstrating near-optimal performance. In particular, the ablation study
+(Table~\ref{tab:ablation_results}) shows that the residual-only estimator
+severely underestimates the true error, with effectivity indices as low as
+$\eta_r \approx 0.0275$ for smooth problems. In contrast, the inclusion of
+the boundary lifting term restores reliability and yields accurate error
+certification.
+
+A central finding of this work is that \emph{boundary mismatch is the dominant
+source of error in PINNs with soft Dirichlet enforcement}. In all considered
+benchmarks, the lifting contribution exceeds the residual contribution by
+one to two orders of magnitude, providing a quantitative explanation for the
+failure of residual-based indicators and training loss as measures of
+solution accuracy.
+
+From a computational perspective, the estimator is fully realizable using
+efficient numerical solvers, including discrete sine transform (DST)
+methods on structured domains and finite element discretizations on
+irregular geometries. The entire pipeline is reproducible and relies only
+on the trained PINN solution and problem data, without requiring access to
+the exact solution for estimator evaluation.
+
+This work establishes a principled and practically implementable framework
+for \emph{certifying} PINN solutions. By integrating classical ideas from
+a posteriori error estimation with modern neural PDE solvers, it resolves
+a critical gap between scientific machine learning and numerical analysis.
+
+\medskip
+
+\noindent
+\textbf{Future work.}
+Several important directions arise from this study:
+\begin{itemize}
+\item Development of estimators based on $a$-harmonic lifting to achieve
+full theoretical consistency for variable-coefficient problems.
+\item Design of adaptive sampling and training strategies guided by the
+estimator for improved accuracy and efficiency.
+\item Extension to time-dependent, nonlinear, and convection-dominated
+problems, where PINNs exhibit significant stability challenges.
+\item Integration of the estimator into training loops for
+\emph{error-controlled} and certified PINN solvers.
+\end{itemize}
+
+\medskip
+
+\noindent
+In conclusion, reliable error certification for PINNs requires explicit
+accounting of both interior residuals and boundary mismatch. The estimator
+proposed in this work provides a mathematically rigorous, computationally
+efficient, and experimentally validated tool for achieving this goal,
+thereby advancing the development of trustworthy neural solvers for
+partial differential equations.

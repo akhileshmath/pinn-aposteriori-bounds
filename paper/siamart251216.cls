@@ -1,8 +1,8 @@
 %%
-%% This is file `siamart220329.cls', based on article.cls
+%% This is file `siamart251216.cls', based on article.cls
 %% Revision of siam macros for use with LaTeX 2e
 %% 
-%% March 2022
+%% December 2025
 %%
 %% You are not allowed to change this file. 
 %% 
@@ -10,7 +10,7 @@
 %% it is distributed together with all of the files in the siam macro 
 %% distribution. These are:
 %%
-%% * siamart220329.cls: Main LaTeX class file (this file)
+%% * siamart251216.cls: Main LaTeX class file (this file)
 %% * siamplain.bst: Bibliographic style file for BibTeX
 %% * docsiamart.tex: Produces documentation
 %% * docsiamart.pdf: Documentation
@@ -45,9 +45,23 @@
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
 %%
 % [[[TODO: Update date and version in next line]]]
-\ProvidesClass{siamart220329}[2022/03/29 v1.4.4 LaTeX document e-class]
+\ProvidesClass{siamart251216}[2025/12/16 v1.4.8 LaTeX document e-class]
 %%
-%% >>jeh>> --- Modified Spring 2022 ---
+%% >>lrp>> --- Modified December 2025 ---
+%%
+%% Additional margin adjustments for print vendors
+%%
+%% >>jeh>> --- Modified November 2025 ---
+%%
+%% Adjusted document trim to match print publication trim of 6.75" x 10"
+%%
+%% >>jeh>> --- Modified February 2025 ---
+%%
+%% Added a fix for cleveref referencing anything defined as a theorem-like environment as a theorem.
+%%
+%% Added a fix for \label and \refstepcounter due to hyperref and cleveref package changes.
+%%
+%% >>jeh>> --- Modified March 2022 ---
 %%
 %% Changover from using "AMS subject classifications" to "MSC codes".
 %%
@@ -67,7 +81,7 @@
 \newif\if@nohypdvips
 \@nohypdvipsfalse
 %%
-%% >>tgk>> --- Removed Summer 2015 --- %back in Winter 2017---MSC
+%% >>tgk>> --- Removed March 2015 --- %back in December 2017---MSC
 %%
 \newif\if@oneeqnum
 \@oneeqnumfalse
@@ -80,7 +94,7 @@
 \newif\if@onethmnum
 \@onethmnumfalse
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for "review" class option to turn on features like line
 %% numbers for paper under review.
@@ -89,7 +103,7 @@
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for "supplement" class option to change title and labels
 %% appropriately for supplemental materials.
@@ -98,7 +112,7 @@
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for "hidelinks" class option to hide hyperlinks.
 \newif\if@hidelinks
@@ -112,6 +126,11 @@
 %_%_%_%_%
 %\newif\if@openbib
 %\@openbibfalse
+%%
+%% >>jeh>> --- Modified November 2025 ---
+%%
+%% Added printtrim option to adjust document trim to match print publication trim of 6.75" x 10"
+%%
 \DeclareOption{a4paper}
    {\setlength\paperheight {297mm}%
     \setlength\paperwidth  {210mm}}
@@ -130,6 +149,10 @@
 \DeclareOption{executivepaper}
    {\setlength\paperheight {10.5in}%
     \setlength\paperwidth  {7.25in}}
+\DeclareOption{printtrim}
+   {\setlength\paperheight {10in}%
+    \setlength\paperwidth  {6.75in}%
+    \setlength\voffset {-.5in}}
 \DeclareOption{landscape}
    {\setlength\@tempdima   {\paperheight}%
     \setlength\paperheight {\paperwidth}%
@@ -140,7 +163,7 @@
 \DeclareOption{twoside}{\@twosidetrue  \@mparswitchtrue}
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for new class options
 \DeclareOption{review}{\@reviewtrue}
@@ -156,7 +179,7 @@
 \DeclareOption{onecolumn}{\@twocolumnfalse}
 \DeclareOption{twocolumn}{\@twocolumntrue}
 %%
-%% >>tgk>> --- Removed Summer 2015 --- %back in Winter 2017---JEH
+%% >>tgk>> --- Removed March 2015 --- %back in December 2017---JEH
 %%
 % \DeclareOption{leqno}{\input{leqno.clo}}
 % \DeclareOption{subeqn}{\input{subeqn.clo}}
@@ -168,9 +191,14 @@
 %%
 %% <<tgk<<
 %%
-\DeclareOption{translated}{\@translatedtrue} % jan 7 2004
+\DeclareOption{translated}{\@translatedtrue} % January 2004
 %\DeclareOption{openbib}{\@openbibtrue}
-\ExecuteOptions{letterpaper,10pt,twoside,onecolumn,leqno,draft,notitlepage}
+%%
+%% >>jeh>> --- Modified November 2025 ---
+%%
+%% Set printtrim option to adjust document trim to match print publication trim of 6.75" x 10"
+%%
+\ExecuteOptions{printtrim,10pt,twoside,onecolumn,leqno,draft,notitlepage}
 \ProcessOptions
 %
 % eliminate siam10.clo altogether:
@@ -251,13 +279,13 @@
 %\addtolength\textheight{\topskip}
 \if@compatibility
   \if@twoside
-%     \setlength\oddsidemargin   {.5in}
-%     \setlength\evensidemargin  {.5in}
-     \setlength\marginparwidth {1.25in}
+     \setlength\oddsidemargin   {1in}
+     \setlength\evensidemargin  {.75in}
+%     \setlength\marginparwidth {1.25in}
   \else
-%     \setlength\oddsidemargin   {.5in}
-%     \setlength\evensidemargin  {.5in}
-     \setlength\marginparwidth  {1.25in}
+     \setlength\oddsidemargin   {1in}
+     \setlength\evensidemargin  {.55in}
+%     \setlength\marginparwidth  {1.25in}
   \fi
   \if@twocolumn
      \setlength\oddsidemargin  {30\p@}
@@ -266,13 +294,13 @@
   \fi
 \else
   \if@twoside
-%     \setlength\oddsidemargin   {.5in}
-%     \setlength\evensidemargin  {.5in}
-     \setlength\marginparwidth {1.25in}
+     \setlength\oddsidemargin   {-.12in}
+     \setlength\evensidemargin  {-.27in}
+%     \setlength\marginparwidth {1.25in}
   \else
-%     \setlength\oddsidemargin   {.5in}
-%     \setlength\evensidemargin  {.5in}
-     \setlength\marginparwidth {1.25in}
+     \setlength\oddsidemargin   {-.19in}
+     \setlength\evensidemargin  {-.29in}
+%     \setlength\marginparwidth {1.25in}
   \fi
   \@settopoint\oddsidemargin
   \@settopoint\marginparwidth
@@ -290,14 +318,14 @@
 %  \@settopoint\topmargin
 \fi
 
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Fix to make bookmarks show up when using pdflatex (+hypertex).
 \setcounter{tocdepth}{3}
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% First step to adding the ntheorem package for theorems, etc. Second
 %% step is further down below. Need to split them because this needs
@@ -354,7 +382,7 @@
 \setlength\normallineskip{1\p@}
 \renewcommand\baselinestretch{}
 %%
-%% >>tgk>> Modified Summer 2015
+%% >>tgk>> Modified March 2015
 %%
 \setlength\parskip{0\p@}
 %%
@@ -511,7 +539,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %_%_%_%_%
 %_%_%_%_%
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for "supplement" class option, to change the title and labels.
 \def\siampretitle{}
@@ -529,7 +557,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
   \begin{center}%
 \@supertitle%
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %%
 %% Support for supplementary materials
     {\bfseries\MakeUppercase{\siampretitle}\@ucnothanks{\@title}\par}%
@@ -547,7 +575,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
   \vskip .11in}
 \def\@ucnothanks#1{\expandafter\@ucnt#1\thanks\relax}
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %%
 %% Fixed capitalization to work with macro for title
 \def\@ucnt#1\thanks{\uppercase\expandafter{#1}\futurelet\@tempa\@ucnta}
@@ -597,7 +625,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \newcounter {paragraph}[subsubsection]
 \newcounter {subparagraph}[paragraph]
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %%
 %% Adding supplement support.
 \renewcommand\thesection       {\siamprelabel\arabic{section}}
@@ -786,14 +814,14 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \setlength{\@negsectionspace}{-1.3ex \@plus -.5ex \@minus -.2ex} %its negation
 
 %%
-%% >>jeh>> --- Added Summer 2016 ---
+%% >>jeh>> --- Added February 2016 ---
 %%
 %% Adding ORCID support.
 
 \newcommand{\orcid}[1]{\ignorespaces}
 
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %% 
 %\newcommand{\insertsectionspace}{\addvspace{\@sectionspace}}
 %\newcommand{\removesectionspace}{\vspace{\@negsectionspace}} %I didn't end up needing these, but they might be needed somewhere
@@ -882,7 +910,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \def\@tempb{}
 
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %%
 %% New Mathops.
 
@@ -897,7 +925,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %%
 %% The original changes to introduce the appendix didn't work
 %% correctly. In particular, calling \section*{Acknowledgments} after
@@ -958,7 +986,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 
 \newcounter{figure}
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %%
 %% Added \siamprelabel for supplement.
 \renewcommand\thefigure{\siamprelabel\@arabic\c@figure}
@@ -977,7 +1005,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
                {\end@dblfloat}
 \newcounter{table}
 %%
-%% >>tgk>>  Modified Summer 2015
+%% >>tgk>>  Modified March 2015
 %%
 %% Adding support for supplement
 \renewcommand{\thetable}{\siamprelabel\@arabic\c@table}
@@ -1046,7 +1074,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
      \@mkboth{\uppercase\expandafter{\refname}}{\uppercase\expandafter{\refname}}
      \addvspace{.15in}\nopagebreak%
 %%
-%% >>tgk>> --- Modified Summer 2015
+%% >>tgk>> --- Modified March 2015
 %%
 %% Adding supplement support by inserting \siamprelabel
       \list{\@biblabel{\siamprelabel\arabic{enumi}}}%
@@ -1135,7 +1163,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \pagenumbering{arabic}      % Arabic page numbers
 
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %%
 % \if@compatibility%
 % \else
@@ -1179,34 +1207,36 @@ Vol.\ #3, No.\ #4, pp.\ #5
    }{#2}%
 }
 
-%%% NEW -- causes multiply defined labels to generate errors
-\def\@newl@bel#1#2#3{%
-  \@ifundefined{#1@#2}%
-    \relax
-    {\gdef \@multiplelabels {%
-      \@latex@warning@no@line{Label `#2' multiply defined}}%
-      \@siamlabel@error{There were multiply-defined labels}{}}%
-  \global\@namedef{#1@#2}{#3}}
-\def\newlabel{\@newl@bel r}
-\@onlypreamble\@newl@bel
-\let \@multiplelabels \relax
-\def\label#1{\@bsphack
-  \protected@write\@auxout{}%
-         {\string\newlabel{#1}{{\@currentlabel}{\thepage}}}%
-  \@esphack}
-\def\refstepcounter#1{\stepcounter{#1}%
-    \protected@edef\@currentlabel
-       {\csname p@#1\endcsname\csname the#1\endcsname}%
-}
+%% >>jeh>> --- Removed February 2025 ---
+%%
+%% fix for \label and \refstepcounter errors due to hyperref changes
+%%
+%%% causes multiply defined labels to generate errors
+%%\def\@newl@bel#1#2#3{%
+%%  \@ifundefined{#1@#2}%
+%%    \relax
+%%    {\gdef \@multiplelabels {%
+%%      \@latex@warning@no@line{Label `#2' multiply defined}}%
+%%      \@siamlabel@error{There were multiply-defined labels}{}}%
+%%  \global\@namedef{#1@#2}{#3}}
+%%\def\newlabel{\@newl@bel r}
+%%\@onlypreamble\@newl@bel
+%%\let \@multiplelabels \relax
+%%\def\label#1{\@bsphack
+%%  \protected@write\@auxout{}%
+%%         {\string\newlabel{#1}{{\@currentlabel}{\thepage}}}%
+%%  \@esphack}
+%%\def\refstepcounter#1{\stepcounter{#1}%
+%%    \protected@edef\@currentlabel
+%%       {\csname p@#1\endcsname\csname the#1\endcsname}%
+%%}
 %%%
-
-
 
 % \def\newarticle{\input{newart.tex}}
 
 % \RequirePackage[dvips]{color}
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %%
 
 % %\definecolor{header1}{cmyk}{.9,.5,0,.35}
@@ -1260,20 +1290,20 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%%\def\@pagecolor{softpage}
 
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for cross-reference (xr-hyper).
 \RequirePackage{xr-hyper}[6.00]
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 \RequirePackage{ifpdf}[2.3]
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for cross-reference hyperlinks
 %% (hyperref). Made it so that it works for both dvi/ps and pdf
@@ -1307,7 +1337,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %% 
 \RequirePackage{xcolor}[2.11]
 \colorlet{siaminlinkcolor}{green!50!black}
@@ -1316,7 +1346,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %% 
 %% Add support for color in order to color the hyperlinks.
 %% 
@@ -1334,13 +1364,13 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 \newcommand{\email}[1]{\protect\href{mailto:#1}{#1}}
 %%
-%% >>tgk>> --- Modified Summer 2015 ---
+%% >>tgk>> --- Modified March 2015 ---
 %% 
 \newcommand{\mref}[1]{\burlalt{mailto:#1}{#1}}
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %\newcommand{\web}[1]{\href{#1}{#1}}
 %%
 %% <<tgk<< 
@@ -1355,7 +1385,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \setlength{\parskip}{1\parskip}
 
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 % This needs to be loaded *before* cleveref
 \RequirePackage{algorithm}[0.1]
@@ -1364,7 +1394,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Adding cleveref package for smart citations, with customizations to
 %% make it act like SIAM expects.
@@ -1397,10 +1427,11 @@ Vol.\ #3, No.\ #4, pp.\ #5
 
 % Make number non-italic in any environment.
 \crefdefaultlabelformat{#2\textup{#1}#3}
+
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Setting up theorems using ntheorem package, customizing to do the
 %% indentations and other features that SIAM likes. Also, adding
@@ -1478,10 +1509,11 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %% <<tgk<<
 %%
 
+
 %new: make new head for assumptions, remarks, etc. Numbered? Unnumbered?
 
 %%
-%% >>tgk>> --- Removed Summer 2015 ---
+%% >>tgk>> --- Removed March 2015 ---
 %%
 % %%% create theorems, etc. with upright font, no italic
 % \def\newheading#1{%
@@ -1527,7 +1559,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 
 %%
-%% >>tgk>> --- Moved elsewhere, Summer 2015
+%% >>tgk>> --- Moved elsewhere, March 2015
 %%
 %\usepackage{lineno}
 %%
@@ -1537,9 +1569,9 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \setlength{\textheight}{598pt} %{598.2275pt}
 
 %%
-%% >>jeh>> --- Updated Fall 2016 ---
+%% >>jeh>> --- Updated May 2016 ---
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 % Support for supplement numbering
 \renewcommand{\theequation}{\siamprelabel\arabic{equation}}
@@ -1550,7 +1582,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 % Adding a command to do running heads with uppercase and supplement support.
 \newcommand{\headers}[2]{
@@ -1562,7 +1594,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 %% <<tgk<<
 %%
-%% >>tgk>> --- Added Summer 2015 ---
+%% >>tgk>> --- Added March 2015 ---
 %%
 %% Support for "review" class option to turn on linenumbers via the
 %% lineno package. Slightly complicated because the lineno and amsmath
@@ -1597,7 +1629,7 @@ Vol.\ #3, No.\ #4, pp.\ #5
 %%
 
 %_%_%_%_%
-%_%_%_%_% patches, fixes JR 1/19/16
+%_%_%_%_% patches, fixes JR January 2016
 %_%_%_%_%
 
 
@@ -1618,13 +1650,13 @@ Vol.\ #3, No.\ #4, pp.\ #5
     {\PotEndMark@opt{#1}}{\SetEndMark{\InTheoType}{#1}{\relax}}}%
 
 
-%_%_%_%_% flag ro remove belowdisplay spacing in math
+%_%_%_%_% flag to remove belowdisplay spacing in math
 %\newcommand{\nomathspace}{\belowdisplayshortskip 0\p@ \@plus5\p@ \@minus3\p@%
 %\belowdisplayskip 0\p@ \@plus0\p@ \@minus0\p@}
 \newcommand{\nomathspace}{\belowdisplayshortskip 0\p@ \@plus3\p@ \@minus3\p@%
 \belowdisplayskip 0\p@ \@plus3\p@ \@minus3\p@}
 
-%% >>tgk>> --- Removed Summer 2015 --- %back in Winter 2017---MSC
+%% >>tgk>> --- Removed March 2015 --- %back in December 2017---MSC
 %%
 \if@oneeqnum
 \else
@@ -1650,6 +1682,22 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \else
 \numberwithin{theorem}{section}
 \fi
+
+\setlength\marginparwidth  {.25in}
+
+%% Fix for cleveref referencing anything defined as a theorem-like environment as a theorem
+%% >>jeh>> --- Added February 2025 ---
+
+\AddToHook{env/lemma/begin}{\crefalias{theorem}{lemma}}
+\AddToHook{env/corollary/begin}{\crefalias{theorem}{corollary}}
+\AddToHook{env/proposition/begin}{\crefalias{theorem}{proposition}}
+\AddToHook{env/definition/begin}{\crefalias{theorem}{definition}}
+\AddToHook{env/claim/begin}{\crefalias{theorem}{claim}}
+\AddToHook{env/fact/begin}{\crefalias{theorem}{fact}}
+\AddToHook{env/conclusion/begin}{\crefalias{theorem}{conclusion}}
+\AddToHook{env/result/begin}{\crefalias{theorem}{result}}
+\AddToHook{env/consequence/begin}{\crefalias{theorem}{consequence}}
+\AddToHook{env/problem/begin}{\crefalias{theorem}{problem}}
 
 %% >>jeh>> --- Added May 2019 ---
 % Hyphenation exceptions for US English.
@@ -1903,6 +1951,5 @@ Vol.\ #3, No.\ #4, pp.\ #5
 \endinput
 
 %% 
-%% End of file `siamart220329.cls'.
-
+%% End of file `siamart251216.cls'.
 

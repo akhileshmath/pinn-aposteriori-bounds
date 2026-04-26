@@ -1,50 +1,114 @@
-\documentclass{siamart220329}
+\documentclass{siamart251216}
 
-\usepackage{mathtools}
-\usepackage{amssymb}
-\usepackage{bm}
+%% ===================== Packages =====================
+\usepackage{amsmath, amssymb, mathtools, bm}
 \usepackage{booktabs}
 \usepackage{enumitem}
-\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
 
 \graphicspath{{figures/}}
 
+%% ===================== Macros =====================
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
-\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
-\newcommand{\Hone}{H^1(\Omega)}
-\newcommand{\Honezero}{H^1_0(\Omega)}
+\newcommand{\seminorm}[1]{\left\lvert #1 \right\rvert_{H^1(\Omega)}} % FIXED
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
 \newcommand{\uhat}{\hat{u}}
 \newcommand{\divop}{\nabla \cdot}
 \newcommand{\gradop}{\nabla}
+\newcommand{\Ltwonorm}[1]{\norm{#1}_{L^2(\Omega)}}
+\newcommand{\Hminusnorm}[1]{\norm{#1}_{H^{-1}(\Omega)}}
+
+%% ===================== Title & Authors =====================
 \headers{A Posteriori Error Bounds for PINNs}{A. Yadav}
-\title{Residual-Based A Posteriori Error Bounds for Physics-Informed Neural Networks in Sobolev Norms}
-\author{Akhilesh Yadav~\href{https://orcid.org/0009-0009-1134-0813}{(ORCID: 0009-0009-1134-0813)}\thanks{Independent researcher (\email{akhileshyadav.maths@gmail.com}).}}
-\date{\today}
+
+\title{Residual-Based A Posteriori Error Bounds for Physics-Informed Neural Networks in Energy Seminorm}
+
+\author{
+Akhilesh Yadav%
+\thanks{Independent researcher (\email{akhileshyadav.maths@gmail.com}).
+ORCID: \href{https://orcid.org/0009-0009-1134-0813}{0009-0009-1134-0813}.
+Code available at
+\href{https://github.com/akhileshmath/pinn-aposteriori-bounds}
+{\texttt{github.com/akhileshmath/pinn-aposteriori-bounds}}.}
+}
+
+\date{}
 
 \newsiamremark{remark}{Remark}
 
+%% ===================== Document =====================
 \begin{document}
+
 \maketitle
 
+%% ===================== Abstract =====================
 \begin{abstract}
-Physics-informed neural networks (PINNs) provide flexible meshfree approximations for partial differential equations, but standard training losses do not certify the actual approximation error. We study a residual-based a posteriori estimator for coercive elliptic PINN solutions with soft Dirichlet boundary enforcement. The estimator combines the dual norm of the interior residual with a harmonic lifting term that captures the boundary mismatch induced by the penalty formulation. We implement a reproducible validation pipeline, including fitted-domain treatment for a singular L-shaped benchmark, and demonstrate reliable effectivities between $1.05$ and $1.31$ across smooth, heterogeneous, and singular test problems. The numerical study also confirms that residual-only estimates are insufficient: the lifting term is consistently the dominant contribution in the validated benchmarks.
+Physics-informed neural networks (PINNs) provide a flexible framework for
+solving partial differential equations, yet their training loss does not
+reliably reflect approximation error in Sobolev norms. In particular,
+PINNs may exhibit small training loss while incurring substantial error
+in the energy seminorm.
+
+We derive a fully computable residual-based \emph{a posteriori} error estimator
+for PINN approximations of coercive elliptic problems with soft Dirichlet
+boundary enforcement. The estimator augments the classical residual term
+with a harmonic lifting that accounts for boundary mismatch, yielding the bound
+\[
+\|\nabla(u - \hat{u})\|_{L^2(\Omega)}
+\;\le\;
+\frac{1}{\alpha}\|R\|_{H^{-1}(\Omega)}
++
+\|\nabla w\|_{L^2(\Omega)}.
+\]
+
+We prove reliability in the energy seminorm for constant-coefficient problems.
+For variable-coefficient diffusion, a Laplace-based lifting is used as a
+computable surrogate for the exact $a$-harmonic lifting, resulting in a
+practically reliable upper bound consistent with the computational framework.
+
+A fully reproducible numerical study demonstrates effectivity indices
+$\eta \in [1.05,\,1.31]$ across smooth, heterogeneous, and singular benchmarks,
+including an L-shaped domain with a re-entrant corner. The results show that
+boundary mismatch is the dominant source of error, while residual-only
+estimators can underestimate the error by orders of magnitude.
+
+These findings establish a principled and practical framework for
+\emph{certifying} PINN solutions in the energy seminorm and highlight the
+necessity of incorporating boundary contributions for reliable error estimation.
 \end{abstract}
 
+%% ===================== Keywords =====================
 \begin{keywords}
-physics-informed neural networks, a posteriori error estimation, elliptic PDEs, Sobolev norms, residual certification
+physics-informed neural networks,
+a posteriori error estimation,
+elliptic partial differential equations,
+energy seminorm,
+harmonic lifting,
+scientific machine learning
 \end{keywords}
 
+%% ===================== MSC =====================
 \begin{MSCcodes}
 65N15, 65N30, 35J25, 68T07
 \end{MSCcodes}
 
+%% ===================== Sections =====================
 \input{sections/introduction}
+
 \input{sections/methodology}
+
+\input{sections/analysis}  
+
 \input{sections/estimator}
+
 \input{sections/experiments}
+
 \input{sections/conclusion}
 
-\input{main.bbl}
+%% ===================== References =====================
+\bibliographystyle{siamplain}
+\bibliography{references}
 
 \end{document}

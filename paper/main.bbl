@@ -1,0 +1,40 @@
+\begin{thebibliography}{1}
+
+\bibitem{ainsworth1997posteriori}
+{\sc M.~Ainsworth and J.~T. Oden}, {\em A posteriori error estimation in finite
+  element analysis}, Computer Methods in Applied Mechanics and Engineering, 142
+  (1997), pp.~1--88.
+
+\bibitem{deryck2022generic}
+{\sc T.~De~Ryck, S.~Lanthaler, and S.~Mishra}, {\em On the approximation of
+  functions by tanh neural networks}, Neural Networks, 143 (2022),
+  pp.~732--750.
+
+\bibitem{karniadakis2021physics}
+{\sc G.~E. Karniadakis, I.~G. Kevrekidis, L.~Lu, P.~Perdikaris, S.~Wang, and
+  L.~Yang}, {\em Physics-informed machine learning}, Nature Reviews Physics, 3
+  (2021), pp.~422--440.
+
+\bibitem{mishra2022estimates}
+{\sc S.~Mishra and R.~Molinaro}, {\em Estimates on the generalization error of
+  physics-informed neural networks for approximating a class of inverse
+  problems for pdes}, IMA Journal of Numerical Analysis, 42 (2022),
+  pp.~981--1022.
+
+\bibitem{raissi2019physics}
+{\sc M.~Raissi, P.~Perdikaris, and G.~E. Karniadakis}, {\em Physics-informed
+  neural networks: A deep learning framework for solving forward and inverse
+  problems involving nonlinear partial differential equations}, Journal of
+  Computational Physics, 378 (2019), pp.~686--707.
+
+\bibitem{shin2020convergence}
+{\sc Y.~Shin, J.~Darbon, and G.~E. Karniadakis}, {\em On the convergence of
+  physics-informed neural networks for linear second-order elliptic and
+  parabolic type pdes}, Communications in Computational Physics, 28 (2020),
+  pp.~2042--2074.
+
+\bibitem{verfurth2013posteriori}
+{\sc R.~Verf{\"u}rth}, {\em A Posteriori Error Estimation Techniques for Finite
+  Element Methods}, Oxford University Press, 2013.
+
+\end{thebibliography}

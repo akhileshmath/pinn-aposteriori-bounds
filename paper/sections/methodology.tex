@@ -1,37 +1,132 @@
-\section{Methodology}\label{sec:methodology}
+\section{Problem Setting and PINN Formulation}\label{sec:methodology}
 
-We consider second-order coercive elliptic problems on a bounded Lipschitz domain $\Omega \subset \R^2$:
-\begin{equation}
-\label{eq:model-problem}
+\subsection{Model problem}
+
+Let $\Omega \subset \mathbb{R}^2$ be a bounded Lipschitz domain. We consider the
+second-order coercive elliptic boundary value problem
+\begin{equation}\label{eq:model-problem}
 \begin{aligned}
--\divop(a(\bm{x}) \gradop u) &= f \qquad &&\text{in } \Omega,\\
-u &= g \qquad &&\text{on } \partial\Omega.
+- \nabla \cdot \bigl(a(\bm{x}) \nabla u\bigr) &= f(\bm{x}) && \text{in } \Omega,\\
+u &= g && \text{on } \partial\Omega,
 \end{aligned}
 \end{equation}
-The diffusion coefficient is assumed uniformly elliptic,
+where $f \in L^2(\Omega)$ and $g \in H^{1/2}(\partial\Omega)$.
+The diffusion coefficient satisfies the uniform ellipticity condition
+\begin{equation}\label{eq:ellipticity}
+\alpha \le a(\bm{x}) \le \beta \quad \text{a.e. in } \Omega,
+\end{equation}
+for constants $0 < \alpha \le \beta < \infty$.
+
+The exact solution $u \in H^1_g(\Omega)$ satisfies the weak formulation
+\begin{equation}\label{eq:weak-form}
+\int_\Omega a \nabla u \cdot \nabla v \, \mathrm{d}\bm{x}
+=
+\int_\Omega f v \, \mathrm{d}\bm{x}
+\quad \forall v \in H^1_0(\Omega).
+\end{equation}
+
+\paragraph{Energy seminorm.}
+We measure approximation quality using the energy seminorm
+\begin{equation}\label{eq:energy-seminorm}
+|v|_{H^1(\Omega)} := \|\nabla v\|_{L^2(\Omega)}.
+\end{equation}
+This seminorm is equivalent to the $H^1$ norm on $H^1_0(\Omega)$.
+For PINN approximations, the error $e = u - \hat{u}$ generally satisfies
+$e \notin H^1_0(\Omega)$ due to weak enforcement of boundary conditions,
+but $|e|_{H^1(\Omega)}$ remains well-defined and serves as the natural
+error measure.
+
+\subsection{PINN approximation}
+
+Let $\hat{u}_\theta : \Omega \to \mathbb{R}$ be a neural network with parameters
+$\theta \in \mathbb{R}^P$. The approximation is obtained by minimizing the loss
+\begin{equation}\label{eq:pinn-loss}
+\mathcal{L}(\theta)
+= w_r \mathcal{L}_{\mathrm{res}}(\theta)
++ w_b \mathcal{L}_{\mathrm{BC}}(\theta),
+\end{equation}
+where
+\begin{equation}
+\mathcal{L}_{\mathrm{res}}(\theta)
+= \frac{1}{N_r} \sum_{i=1}^{N_r}
+\bigl| R(\bm{x}_i^r) \bigr|^2,
+\end{equation}
+\begin{equation}
+\mathcal{L}_{\mathrm{BC}}(\theta)
+= \frac{1}{N_b} \sum_{j=1}^{N_b}
+\bigl| \hat{u}_\theta(\bm{x}_j^b) - g(\bm{x}_j^b) \bigr|^2,
+\end{equation}
+and the \emph{continuous residual} is defined as
+\begin{equation}\label{eq:residual}
+R := f + \nabla \cdot \bigl(a \nabla \hat{u}_\theta\bigr).
+\end{equation}
+
+The differential operator is evaluated using automatic differentiation.
+Interior points $\{\bm{x}_i^r\}$ and boundary points $\{\bm{x}_j^b\}$ are sampled
+independently.
+
+Training is performed using Adam followed by L-BFGS, with fixed weights
+$w_r = 1$ and $w_b = 10$.
+
+\paragraph{Limitation of the training loss.}
+The loss~\eqref{eq:pinn-loss} is evaluated on a finite set of collocation points
+and does not control the residual in Sobolev norms. Moreover, even vanishing
+loss implies satisfaction of the PDE only at sampled points.
+Consequently, the training loss is not a reliable indicator of the energy error
+$|u - \hat{u}|_{H^1(\Omega)}$.
+
+\subsection{Error decomposition and boundary mismatch}
+
+Let $e := u - \hat{u}$ denote the approximation error.
+Since $\hat{u}$ does not satisfy the Dirichlet boundary condition exactly,
+we have $e \notin H^1_0(\Omega)$.
+
+We decompose the error as
+\begin{equation}\label{eq:error-decomposition}
+e = e_0 + w,
+\end{equation}
+where $e_0 \in H^1_0(\Omega)$ and $w$ is the harmonic lifting of the
+boundary mismatch defined by
+\begin{equation}\label{eq:harmonic-lifting}
+\begin{aligned}
+- \Delta w &= 0 && \text{in } \Omega,\\
+w &= g - \hat{u} && \text{on } \partial\Omega.
+\end{aligned}
+\end{equation}
+
+By the triangle inequality,
+\begin{equation}\label{eq:error-split}
+|e|_{H^1(\Omega)} \le |e_0|_{H^1(\Omega)} + \|\nabla w\|_{L^2(\Omega)}.
+\end{equation}
+
+The second term represents the propagation of boundary mismatch into the domain
+and plays a dominant role in the total error for PINNs with soft boundary
+enforcement.
+
+\subsection{Benchmark problems}
+
+We consider three representative benchmarks designed to probe different
+aspects of the estimator.
+
+\paragraph{Poisson problem (smooth).}
+$\Omega = (0,1)^2$, $a \equiv 1$, exact solution
+$u(x,y) = \sin(\pi x)\sin(\pi y)$.
+
+\paragraph{Variable-coefficient diffusion.}
+$\Omega = (0,1)^2$ with spatially varying coefficient
 \[
-0 < \alpha \leq a(\bm{x}) \leq \beta < \infty \quad \text{a.e. in } \Omega.
+a(x,y) = 1 + \tfrac{1}{2}\sin(\pi x)\sin(\pi y),
 \]
-The energy norm is identified with the $H^1_0$ seminorm:
+testing robustness under heterogeneity.
+
+\paragraph{L-shaped domain (singular solution).}
+$\Omega_L = (-1,1)^2 \setminus [0,1)\times(-1,0]$ with solution
 \[
-\norm{v}_{H^1_0(\Omega)} = \norm{\gradop v}_{L^2(\Omega)}.
+u(r,\theta) = r^{2/3}\sin\!\left(\frac{2\theta}{3}\right),
 \]
+exhibiting reduced regularity due to a re-entrant corner.
 
-Let $\uhat$ be a PINN approximation trained by minimizing a soft-constraint loss
-\[
-\mathcal{L}(\theta) = w_r \mathcal{L}_{\mathrm{res}}(\theta) + w_b \mathcal{L}_{\mathrm{bc}}(\theta),
-\]
-where $\mathcal{L}_{\mathrm{res}}$ is the empirical interior residual loss and $\mathcal{L}_{\mathrm{bc}}$ is the empirical Dirichlet penalty. The boundary condition is therefore enforced only weakly, and the approximation error contains both an interior residual component and a boundary mismatch component.
-
-The codebase uses a fixed architecture and training configuration per benchmark. These choices are intentionally frozen in the validated baseline: the goal of the present paper-preparation branch is not to optimize architectures but to present a clean and reproducible certification pipeline.
-
-\subsection{Benchmarks}
-
-The supported benchmark suite contains three coercive elliptic test problems:
-\begin{enumerate}[leftmargin=*]
-\item \textbf{Poisson (smooth).} A manufactured solution on the unit square with homogeneous Dirichlet data.
-\item \textbf{Variable-coefficient diffusion.} A heterogeneous diffusion problem on the unit square with manufactured exact solution.
-\item \textbf{L-shaped singularity.} A Laplace problem on a non-convex L-shaped domain with the classical re-entrant corner singularity $u(r,\theta)=r^{2/3}\sin(2\theta/3)$.
-\end{enumerate}
-
-The first two benchmarks validate the estimator in smooth and heterogeneous settings. The third benchmark probes the singular-domain regime where geometry handling is essential for a trustworthy energy reference and boundary lifting computation.
+These benchmarks enable systematic evaluation of:
+(i) residual contributions,
+(ii) boundary mismatch effects,
+and (iii) estimator reliability under singular behavior.

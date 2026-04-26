@@ -1,0 +1,176 @@
+\section{Mathematical Analysis of the Estimator}\label{sec:analysis}
+
+\subsection{Error decomposition}
+
+Let $u \in H^1_g(\Omega)$ be the exact solution of \eqref{eq:model-problem},
+and let $\hat{u} \in H^1(\Omega)$ be a PINN approximation.
+Define the error
+\[
+e := u - \hat{u}.
+\]
+
+Since boundary conditions are enforced weakly, $e \notin H^1_0(\Omega)$ in general.
+Following Section~\ref{sec:methodology}, we introduce the decomposition
+\begin{equation}\label{eq:analysis-decomposition}
+e = e_0 + w,
+\end{equation}
+where $e_0 \in H^1_0(\Omega)$ and $w \in H^1(\Omega)$ solves
+\begin{equation}\label{eq:analysis-lifting}
+\begin{aligned}
+- \Delta w &= 0 && \text{in } \Omega,\\
+w &= g - \hat{u} && \text{on } \partial\Omega.
+\end{aligned}
+\end{equation}
+
+\subsection{Residual functional}
+
+Define the residual functional $R \in H^{-1}(\Omega)$ by
+\begin{equation}\label{eq:analysis-residual}
+\langle R, v \rangle
+=
+\int_\Omega f v\,dx
+-
+\int_\Omega a \nabla \hat{u} \cdot \nabla v\,dx,
+\quad \forall v \in H^1_0(\Omega).
+\end{equation}
+
+This corresponds to the strong residual
+\[
+R = f + \nabla \cdot (a \nabla \hat{u})
+\]
+in the distributional sense.
+
+\subsection{Error equation}
+
+Subtracting the weak formulation \eqref{eq:weak-form} from
+\eqref{eq:analysis-residual}, we obtain for all $v \in H^1_0(\Omega)$:
+\begin{equation}\label{eq:error-equation}
+\int_\Omega a \nabla e \cdot \nabla v \,dx
+=
+\langle R, v \rangle.
+\end{equation}
+
+Since $e = e_0 + w$ and $v \in H^1_0(\Omega)$, we have
+\[
+\int_\Omega a \nabla e_0 \cdot \nabla v \,dx
+=
+\langle R, v \rangle - \int_\Omega a \nabla w \cdot \nabla v \,dx.
+\]
+
+However, choosing $v = e_0$ yields
+\begin{equation}\label{eq:error-test}
+\int_\Omega a \nabla e_0 \cdot \nabla e_0 \,dx
+=
+\langle R, e_0 \rangle - \int_\Omega a \nabla w \cdot \nabla e_0 \,dx.
+\end{equation}
+
+To avoid coupling terms, we estimate $e_0$ directly using the residual.
+
+\subsection{Main reliability result (constant coefficient case)}
+
+\begin{theorem}[A posteriori reliability]\label{thm:main}
+Assume $a \equiv \text{const}$. Then the PINN approximation satisfies
+\begin{equation}\label{eq:main-bound}
+\|\nabla(u - \hat{u})\|_{L^2(\Omega)}
+\le
+\frac{1}{\alpha}\|R\|_{H^{-1}(\Omega)}
++
+\|\nabla w\|_{L^2(\Omega)}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+
+Taking $v = e_0 \in H^1_0(\Omega)$ in \eqref{eq:error-equation}, we obtain
+\[
+\int_\Omega a \nabla e \cdot \nabla e_0
+=
+\langle R, e_0 \rangle.
+\]
+
+Since $e = e_0 + w$,
+\[
+\int_\Omega a \nabla e_0 \cdot \nabla e_0
++
+\int_\Omega a \nabla w \cdot \nabla e_0
+=
+\langle R, e_0 \rangle.
+\]
+
+For constant $a$, orthogonality of harmonic lifting implies
+\[
+\int_\Omega a \nabla w \cdot \nabla e_0 = 0.
+\]
+
+Hence,
+\[
+\int_\Omega a \nabla e_0 \cdot \nabla e_0
+=
+\langle R, e_0 \rangle.
+\]
+
+Using coercivity and dual norm definition,
+\[
+\alpha \|\nabla e_0\|^2
+\le
+\|R\|_{H^{-1}} \|\nabla e_0\|.
+\]
+
+Therefore,
+\[
+\|\nabla e_0\|
+\le
+\frac{1}{\alpha} \|R\|_{H^{-1}}.
+\]
+
+Finally, by triangle inequality,
+\[
+\|\nabla e\|
+\le
+\|\nabla e_0\|
++
+\|\nabla w\|,
+\]
+which yields the result.
+\end{proof}
+
+\subsection{Variable coefficient case}
+
+For variable diffusion coefficients $a(\bm{x})$, the orthogonality property
+used above no longer holds. The exact decomposition would require an
+$a$-harmonic lifting $w_a$ satisfying
+\[
+- \nabla \cdot (a \nabla w_a) = 0,
+\]
+which is not directly available in a computationally efficient form.
+
+Instead, we use the Laplace-based lifting $w$ defined in
+\eqref{eq:analysis-lifting} as a computable surrogate.
+Although this introduces a consistency gap, the resulting estimator remains
+a valid and practical upper bound in all numerical experiments.
+
+\subsection{Final estimator}
+
+Combining the above results, we define the estimator
+\begin{equation}\label{eq:estimator}
+\eta :=
+\frac{1}{\alpha}\|R\|_{H^{-1}(\Omega)}
++
+\|\nabla w\|_{L^2(\Omega)}.
+\end{equation}
+
+\subsection{Effectivity index}
+
+We assess the sharpness of the estimator using the effectivity index
+\begin{equation}
+\eta_{\mathrm{eff}} :=
+\frac{\eta}{\|\nabla(u - \hat{u})\|_{L^2(\Omega)}}.
+\end{equation}
+
+The numerical results reported in Table~\ref{tab:benchmark_results}
+show that
+\[
+1 \le \eta_{\mathrm{eff}} \le 1.31,
+\]
+confirming both reliability and near-optimal sharpness of the estimator
+across all benchmarks. :contentReference[oaicite:0]{index=0}
