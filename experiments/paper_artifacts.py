@@ -84,7 +84,7 @@ def write_benchmark_table(results: List[Dict], path: str) -> None:
     lines = [
         "\\begin{tabular}{lrrrrr}",
         "\\toprule",
-        "Benchmark & True error & Estimate & Residual & Lifting & $\\eta$ \\\\",
+        "Benchmark & True energy error & Estimated energy error & Residual & Lifting & $\\eta$ \\\\",
         "\\midrule",
     ]
     for item in results:
@@ -108,7 +108,7 @@ def write_ablation_table(ablation: List[Dict], path: str) -> None:
     lines = [
         "\\begin{tabular}{lrrrrrr}",
         "\\toprule",
-        "Benchmark & True error & Residual-only & Lifting-only & Full & $\\eta_r$ & $\\eta$ \\\\",
+        "Benchmark & True energy error & Residual-only & Lifting-only & Full & $\\eta_r$ & $\\eta$ \\\\",
         "\\midrule",
     ]
     for item in ablation:
@@ -350,12 +350,12 @@ def parse_args():
     )
     parser.add_argument(
         "--figure-dir",
-        default=os.path.join(PROJECT_ROOT, "figures", "paper"),
+        default=os.path.join(PROJECT_ROOT, "paper", "figures"),
         help="Directory for paper-ready figures.",
     )
     parser.add_argument(
         "--tables-dir",
-        default=os.path.join(PROJECT_ROOT, "tables"),
+        default=os.path.join(PROJECT_ROOT, "paper", "tables"),
         help="Directory for LaTeX tables.",
     )
     parser.add_argument(

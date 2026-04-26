@@ -1,22 +1,18 @@
-# ==============================
-# Python bytecode & cache
-# ==============================
+# Python bytecode and caches
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Local tooling
 .vincent/
 
-# ==============================
 # Native / compiled extensions
-# ==============================
 *.so
 *.pyd
 *.dll
 *.dylib
 
-# ==============================
-# Build & packaging
-# ==============================
+# Build and packaging
 .Python
 build/
 dist/
@@ -26,9 +22,7 @@ dist/
 pip-wheel-metadata/
 MANIFEST
 
-# ==============================
 # Virtual environments
-# ==============================
 .venv/
 venv/
 env/
@@ -36,9 +30,7 @@ ENV/
 .python-version
 pinn_env/
 
-# ==============================
 # Testing / lint / coverage
-# ==============================
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -51,16 +43,12 @@ pinn_env/
 coverage.xml
 htmlcov/
 
-# ==============================
 # Jupyter / IPython
-# ==============================
 .ipynb_checkpoints/
 profile_default/
 ipython_config.py
 
-# ==============================
-# IDE / Editors
-# ==============================
+# IDE / editors
 .vscode/
 .idea/
 *.iml
@@ -72,23 +60,17 @@ ipython_config.py
 *.swo
 *~
 
-# ==============================
 # OS files
-# ==============================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# ==============================
 # Logs
-# ==============================
 *.log
 *.out
 *.err
 
-# ==============================
 # Experiment outputs
-# ==============================
 checkpoints/
 *.pt
 *.pth
@@ -97,27 +79,17 @@ checkpoints/
 *.pkl
 *.pickle
 
-# Keep validated results if needed
-!results/validated_results.json
-!results/README.md
+# Generated figures outside the paper bundle
+figures/
 
-# ==============================
-# Figures (generated)
-# ==============================
-figures/**/*.png
-figures/**/*.jpg
-figures/**/*.jpeg
-figures/**/*.svg
-figures/**/*.eps
+# Preserve the self-contained paper assets
+!paper/figures/
+!paper/figures/**
+!paper/tables/
+!paper/tables/**
 
-# ⚠️ IMPORTANT: Keep PDFs for paper figures
-!figures/**/*.pdf
-
-# ==============================
-# LaTeX (paper/)
-# ==============================
+# LaTeX build artifacts
 *.aux
-*.bbl
 *.bcf
 *.blg
 *.fdb_latexmk
@@ -141,13 +113,15 @@ figures/**/*.eps
 *.xdv
 *.dvi
 *.ps
+paper/main.log
+paper/main.out
+paper/main.pdf
+paper/main.thm
 
-# ⚠️ DO NOT ignore PDF (your paper!)
-# *.pdf  ❌ REMOVED
+# Keep the compiled bibliography bundled with the paper
+!paper/main.bbl
 
-# ==============================
 # Secrets / env
-# ==============================
 .env
 .env.*
 *.local

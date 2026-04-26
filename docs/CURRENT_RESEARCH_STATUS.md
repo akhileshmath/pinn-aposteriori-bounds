@@ -53,12 +53,12 @@ Archived from the validated scope:
 
 ## What Is Still Not Fully Settled
 
-The repository is cleaner and more defensible now, but some research milestones still remain:
+The validated baseline is now in place, but several paper-preparation tasks still remain:
 
-- full end-to-end validated runs across the supported benchmark suite must be collected and preserved
-- the theory note in the paper must explain the energy norm and boundary lifting cleanly
-- the numerical safety factor used for conservative validation must be documented explicitly in the paper
-- the supported benchmark suite must be evaluated enough times to judge robustness, not just single smoke runs
+- the manuscript must stay consistent with the validated energy-error interpretation
+- figures and tables must be regenerated through the paper-artifact script
+- the local TeX environment must compile the self-contained SIAM manuscript cleanly
+- additional experiments beyond the supported benchmark suite remain future work
 
 ## Practical Interpretation
 
@@ -66,13 +66,13 @@ The repository is currently in this state:
 
 - good enough to demonstrate a serious research direction
 - good enough to justify the refactor and the new workflow
-- not yet enough, by itself, to claim that the full paper is numerically closed
+- numerically validated on the supported benchmark suite, with remaining work concentrated in presentation and submission cleanup
 
 That is not a weakness. It is the correct status for a serious in-progress numerical analysis project.
 
 ## Recommended Next Milestones
 
-1. Run the full supported suite with the validated entry point.
-2. Record the benchmark outcomes in `docs/EXPERIMENT_TRACK.md`.
-3. Decide whether the L-shaped benchmark is stable enough for the main paper.
+1. Keep `results/validated_results.json` as the frozen benchmark baseline.
+2. Regenerate figures and tables through `python experiments/paper_artifacts.py`.
+3. Compile the SIAM manuscript once the local TeX environment is fixed.
 4. Keep convection-diffusion explicitly outside the validated scope unless a separate theorem is proved.
