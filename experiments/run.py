@@ -255,7 +255,7 @@ def parse_args():
     )
     parser.add_argument(
         "--figure-dir",
-        default=os.path.join(PROJECT_ROOT, "figures"),
+        default=os.path.join(PROJECT_ROOT, "results", "figures"),
         help="Directory for generated figures.",
     )
     return parser.parse_args()

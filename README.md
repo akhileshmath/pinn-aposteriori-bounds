@@ -1,146 +1,289 @@
-# PINN Error Bounds
+# Residual-Based A Posteriori Error Bounds for PINNs
 
-Validated a posteriori error estimation for physics-informed neural networks solving coercive elliptic Dirichlet problems with soft boundary conditions.
+This repository implements and validates a **residual-based a posteriori error estimator** for Physics-Informed Neural Networks (PINNs) applied to coercive elliptic PDEs with Dirichlet boundary conditions.
 
-## Project Motive
+The codebase is structured as a **research artifact**, ensuring:
 
-The central claim of this repository is:
+- reproducibility
+- theoretical correctness
+- alignment between code, experiments, and manuscript
 
-> PINNs produce approximate PDE solutions, but standard training does not provide a certificate of accuracy. This project computes that certificate.
+---
 
-A trained PINN gives a neural approximation `u_hat`, but a small training loss does not by itself quantify how far `u_hat` is from the exact solution `u` in a mathematically meaningful norm. The goal of this repository is to compute a rigorous, reproducible upper bound on that error.
+### Project Overview
 
-## Project Goal
+Physics-Informed Neural Networks (PINNs) approximate PDE solutions, but **training loss does not provide a reliable error certificate**.
 
-The supported estimator is
+This work develops a **rigorous, computable a posteriori error bound** for a PINN approximation $$\hat{u}$$ of the true solution $$u$$ in the energy norm.
 
-\[
-\|u - \hat{u}\|_{H^1_0(\Omega)} \le \frac{1}{\alpha}\|R\|_{H^{-1}(\Omega)} + \|\nabla w\|_{L^2(\Omega)},
-\]
+### Validated Benchmarks
+
+- Poisson equation (smooth solution)
+- Variable-coefficient diffusion
+- L-shaped domain (singularity)
+
+---
+
+##  Mathematical Formulation
+
+We consider the elliptic PDE:
+
+$$
+-\nabla \cdot (a(x)\nabla u(x)) = f(x)
+\quad \text{in } \Omega,
+$$
+
+$$
+u = g \quad \text{on } \partial\Omega
+$$
+
+where $$a(x) \ge \alpha > 0$$ ensures coercivity.
+
+---
+
+### A Posteriori Error Bound
+
+The validated estimator is:
+
+$$
+\|u - \hat{u}\|_{H^1_0(\Omega)}
+\;\le\;
+\frac{1}{\alpha} \|R\|_{H^{-1}(\Omega)}
+\;+\;
+\|\nabla w\|_{L^2(\Omega)}
+$$
 
 where:
-- `R = f + div(a grad u_hat)` is the interior residual
-- `w` is the harmonic lifting of the boundary mismatch, solving `-Delta w = 0` in `Omega` with `w = g - u_hat` on `partial Omega`
 
-This is the only estimator supported by the validated pipeline.
+- Interior residual:
+$$
+R = f + \nabla \cdot (a \nabla \hat{u})
+$$
 
-## Current Validated Scope
+- Boundary lifting:
+$$
+-\Delta w = 0 \quad \text{in } \Omega
+$$
 
-The validated repository covers three coercive elliptic benchmarks:
-- Poisson on the unit square
-- variable-coefficient diffusion on the unit square
-- the L-shaped Laplace problem with a re-entrant corner singularity
+$$
+w = g - \hat{u} \quad \text{on } \partial\Omega
+$$
 
-The historical run log in [exp_log.md](./exp_log.md) remains useful as background evidence, but it should be read as pre-refactor history rather than as part of the current validated pipeline.
+---
 
-For current status and research tracking, use:
-- [docs/CURRENT_RESEARCH_STATUS.md](./docs/CURRENT_RESEARCH_STATUS.md)
-- [docs/EXPERIMENT_TRACK.md](./docs/EXPERIMENT_TRACK.md)
-- [docs/PROJECT_MOTIVE_GOAL_AND_READY_TO_WRITE.md](./docs/PROJECT_MOTIVE_GOAL_AND_READY_TO_WRITE.md)
+### 🔴 Key Insight
 
-## Validated Results
+- ❌ Residual-only estimators are **incomplete**
+- ✔ Boundary mismatch contributes significantly to error
+- ✔ Full estimator ensures **reliability**
 
-The current validated benchmark suite achieves effectivities in the range `1.05-1.31`:
-- Poisson: `eta = 1.0501`
-- Variable coefficient diffusion: `eta = 1.0676`
-- L-shaped singularity: `eta = 1.3056`
+---
 
-These values are stored in [results/validated_results.json](./results/validated_results.json).
+## ⚙️ Methodology
 
-## Quick Start
+The pipeline consists of three core modules:
 
-Install dependencies:
+### 1. PINN Solver (`src/pinn/`)
+- neural network architecture
+- collocation sampling
+- training (Adam + L-BFGS)
 
-```bash
-pip install -r requirements.txt
+### 2. Error Estimator (`src/estimator/`)
+
+- dual norm computation $$\|R\|_{H^{-1}}$$
+- harmonic lifting $$w$$
+- error decomposition
+- effectivity validation
+
+### 3. Benchmarks (`src/benchmarks/`)
+
+- PDE definitions
+- exact solutions
+- domain geometry
+- coercivity constants
+
+---
+
+## Repository Structure
+
 ```
 
-Run the lightweight validation tests:
+pinn-error-bounds/
+│
+├── src/
+│   ├── pinn/
+│   ├── estimator/
+│   └── benchmarks/
+│
+├── experiments/
+│   ├── run.py
+│   └── paper_artifacts.py
+│
+├── results/
+│   ├── validated_results.json
+│   └── paper/
+│
+├── paper/
+│   ├── main.tex
+│   ├── figures/
+│   ├── tables/
+│   └── sections/
+│
+├── docs/
+│   └── archive/
+│
+├── tests/
+├── requirements.txt
+└── setup.py
+
+```
+
+---
+
+## 📊 Results (Validated)
+
+Stored in:
+```
+
+results/validated_results.json
+
+````
+
+### Effectivity Index
+
+$$
+\eta = \frac{\text{Estimated Error}}{\text{True Error}}
+$$
+
+| Benchmark | η |
+|----------|---|
+| Poisson | 1.0501 |
+| Variable Coefficient | 1.0676 |
+| L-shaped Domain | 1.3056 |
+
+---
+
+### Interpretation
+
+- $$\eta \ge 1$$ → estimator is **reliable**
+- $$\eta \approx 1$$ → estimator is **sharp**
+- L-shaped domain → higher η due to singularity
+
+---
+
+## 🔬 Scientific Findings
+
+### Training Loss is Misleading
+Small loss does NOT imply small error.
+
+---
+
+### Residual Alone is Insufficient
+Fails to capture boundary error.
+
+---
+
+### Full Estimator is Reliable
+Includes both:
+- interior residual
+- boundary lifting
+
+---
+
+##  Reproducibility
+
+### Install dependencies
+```bash
+pip install -r requirements.txt
+````
+
+---
+
+### Run tests
 
 ```bash
 python tests.py
 ```
 
-Run one benchmark first:
+---
 
-```bash
-python experiments/run.py --benchmark poisson
-```
-
-Run the full validated pipeline:
+### Run experiments
 
 ```bash
 python experiments/run.py
 ```
 
-Generate the paper artifacts:
+Outputs:
+
+* metrics → `results/validated_results.json`
+* figures → `results/figures/`
+
+---
+
+### Generate paper artifacts
 
 ```bash
 python experiments/paper_artifacts.py
 ```
 
-## Repository Layout
+Outputs:
 
-```text
-pinn-error-bounds/
-|- src/
-|  |- pinn/
-|  |- estimator/
-|  `- benchmarks/
-|- experiments/
-|  |- run.py
-|  `- paper_artifacts.py
-|- results/
-|- paper/
-|- docs/
-|- tests/
-|- README.md
-|- requirements.txt
-`- setup.py
-```
+* figures → `paper/figures/`
+* tables → `paper/tables/`
+* JSON → `results/paper/`
 
-## Output Structure
+---
 
-- `results/validated_results.json`: frozen validated benchmark outputs
-- `results/paper/`: machine-readable paper artifact JSON
-- `paper/figures/`: submission figures
-- `paper/tables/`: submission tables
-- `paper/`: self-contained manuscript source
-
-## Supported Workflow
-
-Use the refactored entry points only:
+## 📄 Paper Compilation
 
 ```bash
-python experiments/run.py
-python experiments/paper_artifacts.py
+cd paper
+pdflatex main.tex
+pdflatex main.tex
 ```
 
-Do not use exploratory output files as the basis for new claims unless they are explicitly regenerated through these scripts.
+* Uses bundled `.bbl` (arXiv-safe)
+* No external dependencies required
 
-## What Gets Logged
+---
 
-Each benchmark stores:
-- true energy error
-- estimated energy error
-- residual contribution
-- boundary lifting contribution
-- effectivity index `eta`
-- training loss
-- estimator mesh size
-- stabilization settings
+## 📚 Documentation
 
-## Expected Interpretation
+* `docs/CURRENT_RESEARCH_STATUS.md`
+* `docs/EXPERIMENT_SUMMARY.md`
+* `docs/PROJECT_MOTIVE_GOAL_AND_READY_TO_WRITE.md`
 
-Good signs:
-- tests pass
-- the runs finish without solver failures
-- `eta >= 1`
-- `eta` stays reasonably close to `1`
-- residual and boundary contributions are both visible in the decomposition
+---
 
-Bad signs:
-- `eta < 1`
-- repeated instability in the dual solve
-- boundary lifting stays artificially zero under soft boundary conditions
-- materially different results under fixed seeds
+##  Scope
+
+This repository validates:
+
+✔ Coercive elliptic PDEs
+✔ Soft boundary PINNs
+✔ Residual + boundary estimator
+
+It does NOT claim validity for:
+
+*  convection-dominated problems
+*  non-coercive PDEs
+* hyperbolic systems
+
+---
+
+##  Contribution
+
+> A corrected and reliable a posteriori error estimator for PINNs that accounts for both interior residual and boundary mismatch.
+
+---
+
+##  Citation
+
+```bibtex
+@article{yadav2026aposteriori,
+  title={Residual-Based A Posteriori Error Bounds for PINN Solutions of Elliptic PDEs},
+  author={Yadav, Akhilesh},
+  year={2026},
+  journal={arXiv preprint}
+}
+```

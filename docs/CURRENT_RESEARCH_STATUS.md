@@ -12,7 +12,7 @@ That separation is important if the project is to look like a serious research c
 
 ## What The Legacy Experiment Log Shows
 
-The historical run log in [exp_log.md](D:/Work/PHD-2026/Project/project-2/pinn-error-bounds/exp_log.md) captures the main reason the repository needed refactoring.
+The historical run log in [archive/exp_log_legacy.md](./archive/exp_log_legacy.md) captures the main reason the repository needed refactoring.
 
 The old pipeline showed:
 

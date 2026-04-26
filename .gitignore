@@ -79,14 +79,8 @@ checkpoints/
 *.pkl
 *.pickle
 
-# Generated figures outside the paper bundle
-figures/
-
-# Preserve the self-contained paper assets
-!paper/figures/
-!paper/figures/**
-!paper/tables/
-!paper/tables/**
+# Generated benchmark figures
+results/figures/
 
 # LaTeX build artifacts
 *.aux
