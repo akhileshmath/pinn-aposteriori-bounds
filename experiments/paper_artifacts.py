@@ -3,7 +3,6 @@ import argparse
 import json
 import os
 import sys
-from dataclasses import asdict
 from typing import Dict, List
 
 import matplotlib
@@ -16,12 +15,20 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from experiments.run import build_benchmark_configs, set_reproducibility
+from experiments.run import set_reproducibility
 from src.benchmarks import get_supported_benchmarks
 from src.estimator import ValidatedEstimator
 from src.estimator.dual_norm import compute_dual_norm
 from src.estimator.lifting import compute_boundary_lifting_norm
 from src.pinn import PINNNetwork, PINNSolver, Trainer, get_domain_samplers
+from experiments.common import (
+    collect_run_metadata,
+    ensure_dir,
+    load_benchmark_configs,
+    save_json,
+    validate_benchmark_results,
+    validate_paper_artifact_payload,
+)
 
 
 plt.rcParams.update(
@@ -37,19 +44,16 @@ plt.rcParams.update(
     }
 )
 
-
-def ensure_dir(path: str) -> None:
-    os.makedirs(path, exist_ok=True)
-
-
-def save_json(obj: Dict, path: str) -> None:
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(obj, handle, indent=2)
+CONFIG_PATH = os.path.join(PROJECT_ROOT, "configs", "validated_benchmarks.json")
 
 
 def load_results(path: str) -> List[Dict]:
     with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle)
+        payload = json.load(handle)
+    if isinstance(payload, dict) and "results" in payload:
+        payload = payload["results"]
+    validate_benchmark_results(payload)
+    return payload
 
 
 def build_ablation(results: List[Dict]) -> List[Dict]:
@@ -213,7 +217,7 @@ def _true_error_at_mesh(solver, benchmark, mesh_size: int, seed: int) -> Dict[st
 
 def evaluate_convergence(results: List[Dict], device: str, seed: int) -> List[Dict]:
     benchmarks = get_supported_benchmarks()
-    configs = build_benchmark_configs()
+    configs = load_benchmark_configs(CONFIG_PATH)
     convergence = []
 
     for index, item in enumerate(results):
@@ -363,6 +367,11 @@ def parse_args():
         default=os.path.join(PROJECT_ROOT, "docs", "EXPERIMENT_SUMMARY.md"),
         help="Path to the concise experiment summary markdown file.",
     )
+    parser.add_argument(
+        "--metadata-file",
+        default=os.path.join(PROJECT_ROOT, "results", "paper", "artifact_metadata.json"),
+        help="Path to the reproducibility metadata JSON file for paper artifacts.",
+    )
     parser.add_argument("--device", default="cpu", help="Torch device for convergence reruns.")
     parser.add_argument("--seed", type=int, default=42, help="Global seed for convergence reruns.")
     return parser.parse_args()
@@ -373,22 +382,32 @@ def main():
     ensure_dir(args.results_dir)
     ensure_dir(args.figure_dir)
     ensure_dir(args.tables_dir)
+    ensure_dir(os.path.dirname(args.metadata_file))
 
     results = load_results(args.results_file)
     ablation = build_ablation(results)
     convergence = evaluate_convergence(results, args.device, args.seed)
 
-    save_json(
-        {
-            "source_results": os.path.abspath(args.results_file),
-            "benchmarks": results,
-            "ablation": ablation,
-            "convergence": convergence,
-        },
-        os.path.join(args.results_dir, "paper_artifacts.json"),
+    metadata = collect_run_metadata(
+        project_root=PROJECT_ROOT,
+        entrypoint="experiments/paper_artifacts.py",
+        seed=args.seed,
+        device=args.device,
+        config_path=CONFIG_PATH,
+        extra={"source_results": os.path.abspath(args.results_file)},
     )
-    save_json({"ablation": ablation}, os.path.join(args.results_dir, "ablation_results.json"))
-    save_json({"convergence": convergence}, os.path.join(args.results_dir, "convergence_results.json"))
+    payload = {
+        "metadata": metadata,
+        "source_results": os.path.abspath(args.results_file),
+        "benchmarks": results,
+        "ablation": ablation,
+        "convergence": convergence,
+    }
+    validate_paper_artifact_payload(payload)
+    save_json(payload, os.path.join(args.results_dir, "paper_artifacts.json"))
+    save_json({"metadata": metadata, "ablation": ablation}, os.path.join(args.results_dir, "ablation_results.json"))
+    save_json({"metadata": metadata, "convergence": convergence}, os.path.join(args.results_dir, "convergence_results.json"))
+    save_json(metadata, args.metadata_file)
 
     write_benchmark_table(results, os.path.join(args.tables_dir, "benchmark_results.tex"))
     write_ablation_table(ablation, os.path.join(args.tables_dir, "ablation_results.tex"))
@@ -401,6 +420,7 @@ def main():
     write_summary(results, ablation, convergence, args.summary_file)
 
     print(f"Paper artifact JSON saved to {args.results_dir}")
+    print(f"Artifact metadata saved to {args.metadata_file}")
     print(f"Paper figures saved to {args.figure_dir}")
     print(f"LaTeX tables saved to {args.tables_dir}")
     print(f"Experiment summary saved to {args.summary_file}")

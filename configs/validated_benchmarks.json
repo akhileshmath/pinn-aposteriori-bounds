@@ -1,0 +1,71 @@
+{
+  "poisson": {
+    "network": {
+      "hidden_dims": [64, 64, 64, 64],
+      "activation": "tanh",
+      "use_fourier": false,
+      "fourier_sigma": 1.0
+    },
+    "training": {
+      "adam_lr": 0.001,
+      "adam_epochs": 5000,
+      "lbfgs_epochs": 200,
+      "n_collocation": 2000,
+      "n_boundary": 500,
+      "w_r": 1.0,
+      "w_b": 10.0,
+      "boundary_warmup_epochs": 0,
+      "boundary_warmup_weight": 10.0,
+      "resample_every": 1000,
+      "print_every": 1000
+    },
+    "mesh_size": 96,
+    "sampler": {}
+  },
+  "variable_coefficient": {
+    "network": {
+      "hidden_dims": [64, 64, 64, 64],
+      "activation": "tanh",
+      "use_fourier": false,
+      "fourier_sigma": 1.0
+    },
+    "training": {
+      "adam_lr": 0.001,
+      "adam_epochs": 8000,
+      "lbfgs_epochs": 300,
+      "n_collocation": 2500,
+      "n_boundary": 600,
+      "w_r": 1.0,
+      "w_b": 10.0,
+      "boundary_warmup_epochs": 0,
+      "boundary_warmup_weight": 10.0,
+      "resample_every": 1000,
+      "print_every": 1600
+    },
+    "mesh_size": 96,
+    "sampler": {}
+  },
+  "l_shaped": {
+    "network": {
+      "hidden_dims": [64, 64, 64, 64],
+      "activation": "tanh",
+      "use_fourier": false,
+      "fourier_sigma": 1.0
+    },
+    "training": {
+      "adam_lr": 0.001,
+      "adam_epochs": 8000,
+      "lbfgs_epochs": 300,
+      "n_collocation": 3000,
+      "n_boundary": 800,
+      "w_r": 1.0,
+      "w_b": 10.0,
+      "boundary_warmup_epochs": 0,
+      "boundary_warmup_weight": 10.0,
+      "resample_every": 1000,
+      "print_every": 1600
+    },
+    "mesh_size": 80,
+    "sampler": {}
+  }
+}

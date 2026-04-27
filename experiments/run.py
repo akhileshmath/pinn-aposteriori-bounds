@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import argparse
-import json
 import os
 import sys
-from dataclasses import asdict
 
 import matplotlib
 matplotlib.use("Agg")
@@ -17,7 +15,15 @@ if PROJECT_ROOT not in sys.path:
 
 from src.benchmarks import get_supported_benchmarks
 from src.estimator import ValidatedEstimator
-from src.pinn import PINNNetwork, PINNSolver, Trainer, TrainingConfig, get_domain_samplers
+from src.pinn import PINNNetwork, PINNSolver, Trainer, get_domain_samplers
+from experiments.common import (
+    collect_run_metadata,
+    ensure_dir,
+    load_benchmark_configs,
+    save_json,
+    serialise_training_config,
+    validate_benchmark_results,
+)
 
 
 plt.rcParams.update(
@@ -33,6 +39,9 @@ plt.rcParams.update(
 )
 
 
+CONFIG_PATH = os.path.join(PROJECT_ROOT, "configs", "validated_benchmarks.json")
+
+
 def set_reproducibility(seed: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -40,65 +49,7 @@ def set_reproducibility(seed: int) -> None:
 
 
 def build_benchmark_configs():
-    return {
-        "poisson": {
-            "network": {
-                "hidden_dims": [64, 64, 64, 64],
-                "activation": "tanh",
-                "use_fourier": False,
-                "fourier_sigma": 1.0,
-            },
-            "training": TrainingConfig(
-                adam_epochs=5000,
-                lbfgs_epochs=200,
-                n_collocation=2000,
-                n_boundary=500,
-                w_r=1.0,
-                w_b=10.0,
-                print_every=1000,
-            ),
-            "mesh_size": 96,
-            "sampler": {},
-        },
-        "variable_coefficient": {
-            "network": {
-                "hidden_dims": [64, 64, 64, 64],
-                "activation": "tanh",
-                "use_fourier": False,
-                "fourier_sigma": 1.0,
-            },
-            "training": TrainingConfig(
-                adam_epochs=8000,
-                lbfgs_epochs=300,
-                n_collocation=2500,
-                n_boundary=600,
-                w_r=1.0,
-                w_b=10.0,
-                print_every=1600,
-            ),
-            "mesh_size": 96,
-            "sampler": {},
-        },
-        "l_shaped": {
-            "network": {
-                "hidden_dims": [64, 64, 64, 64],
-                "activation": "tanh",
-                "use_fourier": False,
-                "fourier_sigma": 1.0,
-            },
-            "training": TrainingConfig(
-                adam_epochs=8000,
-                lbfgs_epochs=300,
-                n_collocation=3000,
-                n_boundary=800,
-                w_r=1.0,
-                w_b=10.0,
-                print_every=1600,
-            ),
-            "mesh_size": 80,
-            "sampler": {},
-        },
-    }
+    return load_benchmark_configs(CONFIG_PATH)
 
 
 def run_single_experiment(benchmark, config, device: str, seed: int):
@@ -135,7 +86,7 @@ def run_single_experiment(benchmark, config, device: str, seed: int):
         "key": benchmark.key,
         "description": benchmark.description,
         "architecture": config["network"],
-        "training_config": asdict(config["training"]),
+        "training_config": serialise_training_config(config["training"]),
         "history": {
             "epochs": history.epochs[::100],
             "total_loss": history.total_loss[::100],
@@ -147,8 +98,7 @@ def run_single_experiment(benchmark, config, device: str, seed: int):
 
 
 def save_results(results, path: str) -> None:
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(results, handle, indent=2)
+    save_json(results, path)
 
 
 def _metric_series(results, key):
@@ -254,6 +204,11 @@ def parse_args():
         help="Path to the JSON results file.",
     )
     parser.add_argument(
+        "--metadata-file",
+        default=os.path.join(PROJECT_ROOT, "results", "validated_results.meta.json"),
+        help="Path to the reproducibility metadata JSON file.",
+    )
+    parser.add_argument(
         "--figure-dir",
         default=os.path.join(PROJECT_ROOT, "results", "figures"),
         help="Directory for generated figures.",
@@ -273,7 +228,8 @@ def main():
     else:
         selected_keys = [args.benchmark]
 
-    os.makedirs(os.path.dirname(args.results_file), exist_ok=True)
+    ensure_dir(os.path.dirname(args.results_file))
+    ensure_dir(os.path.dirname(args.metadata_file))
 
     results = []
     for key in selected_keys:
@@ -289,7 +245,17 @@ def main():
             )
         results.append(output)
 
+    validate_benchmark_results(results)
     save_results(results, args.results_file)
+    metadata = collect_run_metadata(
+        project_root=PROJECT_ROOT,
+        entrypoint="experiments/run.py",
+        seed=args.seed,
+        device=args.device,
+        config_path=CONFIG_PATH,
+        extra={"benchmarks": selected_keys},
+    )
+    save_json(metadata, args.metadata_file)
     generate_figures(results, args.figure_dir)
 
     print("\nSummary")
@@ -303,6 +269,7 @@ def main():
             f"eta={metrics['effectivity']:.4f}"
         )
     print(f"\nResults saved to {args.results_file}")
+    print(f"Metadata saved to {args.metadata_file}")
     print(f"Figures saved to {args.figure_dir}")
 
 
