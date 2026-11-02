@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Identity, known-answer and regression tests for the energy-error estimator.
 
 Run with either
