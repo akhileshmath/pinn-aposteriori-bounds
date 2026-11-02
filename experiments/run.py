@@ -48,6 +48,19 @@ def set_reproducibility(seed: int) -> None:
     torch.use_deterministic_algorithms(True)
 
 
+def _thin(values, step: int = 100):
+    """Every ``step``-th entry of a training-history list, always including the last entry.
+
+    Plain ``values[::step]`` drops the final training step whenever ``len(values) - 1`` is not a
+    multiple of ``step``, so the stored history would not end at the final loss.
+    """
+    values = list(values)
+    thinned = values[::step]
+    if values and (len(values) - 1) % step != 0:
+        thinned.append(values[-1])
+    return thinned
+
+
 def build_benchmark_configs():
     return load_benchmark_configs(CONFIG_PATH)
 
@@ -96,10 +109,10 @@ def run_single_experiment(benchmark, config, device: str, seed: int, weights_dir
         "architecture": config["network"],
         "training_config": serialise_training_config(config["training"]),
         "history": {
-            "epochs": history.epochs[::100],
-            "total_loss": history.total_loss[::100],
-            "residual_loss": history.residual_loss[::100],
-            "boundary_loss": history.boundary_loss[::100],
+            "epochs": _thin(history.epochs),
+            "total_loss": _thin(history.total_loss),
+            "residual_loss": _thin(history.residual_loss),
+            "boundary_loss": _thin(history.boundary_loss),
         },
         "metrics": result.to_dict(),
     }
@@ -123,13 +136,13 @@ def plot_effectivity(results, path: str) -> None:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     bars = ax.bar(np.arange(len(labels)), values, color=["#1f77b4", "#2ca02c", "#ff7f0e"])
     ax.axhline(1.0, color="black", linestyle="--", linewidth=1.0)
-    ax.axhline(2.0, color="red", linestyle=":", linewidth=1.0)
+    ax.axhline(2.0 ** 0.5, color="gray", linestyle=":", linewidth=1.0)  # sqrt(2): sum-form limit, constant a
     for bar, val in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2.0, val + 0.02, f"{val:.2f}", ha="center")
     ax.set_xticks(np.arange(len(labels)))
     ax.set_xticklabels(labels, rotation=10, ha="right")
     ax.set_ylabel("Effectivity index η")
-    ax.set_title("Validated effectivity indices")
+    ax.set_title("Effectivity of the sum form")
     fig.savefig(path)
     plt.close(fig)
 
