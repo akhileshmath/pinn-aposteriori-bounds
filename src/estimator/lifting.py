@@ -4,18 +4,41 @@ from scipy.fft import dstn, idstn
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 
+from .p1_energy import p1_energy_square
+
 
 def compute_boundary_lifting_norm(
     solver,
     benchmark,
     n_mesh: int,
     stabilization_eps: float,
+    weighted: bool = False,
 ) -> float:
+    """Energy of the discrete harmonic (Laplace) lifting of the boundary mismatch.
+
+    ``weighted=False`` returns ||grad w_h||_{L2}.  ``weighted=True`` returns
+    ||w_h||_a = (int a |grad w_h|^2)^{1/2}, with a evaluated at triangle centroids; this is the
+    quantity required by the variable-coefficient bound (Theorem 3.3).
+    """
+    a_fun = _coefficient_callable(benchmark, solver) if weighted else None
     if benchmark.domain == "unit_square":
-        return _lifting_unit_square(solver, benchmark, n_mesh, stabilization_eps)
+        return _lifting_unit_square(solver, benchmark, n_mesh, stabilization_eps, a_fun)
     if benchmark.domain == "l_shaped":
-        return _lifting_l_shaped(solver, benchmark, n_mesh, stabilization_eps)
+        return _lifting_l_shaped(solver, benchmark, n_mesh, stabilization_eps, a_fun)
     raise ValueError(f"Unsupported domain '{benchmark.domain}'")
+
+
+def _coefficient_callable(benchmark, solver):
+    """Vectorised numpy wrapper around benchmark.diffusion_coeff (float64)."""
+
+    def a_fun(x, y):
+        x = np.asarray(x, dtype=np.float64)
+        points = np.stack([x.ravel(), np.asarray(y, dtype=np.float64).ravel()], axis=1)
+        tensor = torch.tensor(points, dtype=torch.float64, device=solver.device)
+        values = benchmark.diffusion_coeff(tensor).detach().cpu().numpy().astype(np.float64)
+        return values.reshape(x.shape)
+
+    return a_fun
 
 
 def _boundary_mismatch(solver, benchmark, x_value: float, y_value: float) -> float:
@@ -25,7 +48,7 @@ def _boundary_mismatch(solver, benchmark, x_value: float, y_value: float) -> flo
     return float(exact - pred)
 
 
-def _lifting_unit_square(solver, benchmark, n_mesh: int, stabilization_eps: float) -> float:
+def _lifting_unit_square(solver, benchmark, n_mesh: int, stabilization_eps: float, a_fun=None) -> float:
     h = 1.0 / (n_mesh + 1)
     x_full = np.linspace(0.0, 1.0, n_mesh + 2)
     y_full = np.linspace(0.0, 1.0, n_mesh + 2)
@@ -66,11 +89,11 @@ def _lifting_unit_square(solver, benchmark, n_mesh: int, stabilization_eps: floa
     full_grid[:, 0] = traces["left"]
     full_grid[:, -1] = traces["right"]
 
-    energy = _edge_based_dirichlet_energy(full_grid, np.ones((n_mesh + 2, n_mesh + 2), dtype=bool))
+    energy = p1_energy_square(full_grid, a_fun)
     return float(np.sqrt(max(float(energy), 0.0)))
 
 
-def _lifting_l_shaped(solver, benchmark, n_mesh: int, stabilization_eps: float) -> float:
+def _lifting_l_shaped(solver, benchmark, n_mesh: int, stabilization_eps: float, a_fun=None) -> float:
     nodes, triangles, boundary_nodes = _build_l_shaped_triangular_mesh(n_mesh)
     boundary_values = np.array(
         [_boundary_mismatch(solver, benchmark, x_val, y_val) for x_val, y_val in nodes],
@@ -103,7 +126,8 @@ def _lifting_l_shaped(solver, benchmark, n_mesh: int, stabilization_eps: float) 
         tri_values = solution[tri]
         area, gradients = _triangle_shape_gradients(tri_nodes)
         gradient = tri_values @ gradients
-        energy += area * float(np.dot(gradient, gradient))
+        weight = 1.0 if a_fun is None else float(a_fun(*tri_nodes.mean(axis=0)))
+        energy += weight * area * float(np.dot(gradient, gradient))
 
     return float(np.sqrt(max(energy, 0.0)))
 
@@ -188,23 +212,3 @@ def _triangle_shape_gradients(triangle_nodes: np.ndarray):
 def _triangle_stiffness(triangle_nodes: np.ndarray) -> np.ndarray:
     area, gradients = _triangle_shape_gradients(triangle_nodes)
     return area * (gradients @ gradients.T)
-
-
-def _edge_based_dirichlet_energy(full_grid: np.ndarray, valid_mask: np.ndarray) -> float:
-    energy = 0.0
-
-    # Horizontal edges.
-    for i in range(full_grid.shape[0]):
-        for j in range(full_grid.shape[1] - 1):
-            if valid_mask[i, j] and valid_mask[i, j + 1]:
-                diff = full_grid[i, j + 1] - full_grid[i, j]
-                energy += diff**2
-
-    # Vertical edges.
-    for i in range(full_grid.shape[0] - 1):
-        for j in range(full_grid.shape[1]):
-            if valid_mask[i, j] and valid_mask[i + 1, j]:
-                diff = full_grid[i + 1, j] - full_grid[i, j]
-                energy += diff**2
-
-    return energy

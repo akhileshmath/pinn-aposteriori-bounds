@@ -88,7 +88,7 @@ def write_benchmark_table(results: List[Dict], path: str) -> None:
     lines = [
         "\\begin{tabular}{lrrrrr}",
         "\\toprule",
-        "Benchmark & True energy error & Estimated energy error & Residual & Lifting & $\\eta$ \\\\",
+        "Benchmark & True energy error & Estimated energy error & Residual & Lifting & $\\eta_{\\mathrm{eff}}$ \\\\",
         "\\midrule",
     ]
     for item in results:
@@ -112,7 +112,7 @@ def write_ablation_table(ablation: List[Dict], path: str) -> None:
     lines = [
         "\\begin{tabular}{lrrrrrr}",
         "\\toprule",
-        "Benchmark & True energy error & Residual-only & Lifting-only & Full & $\\eta_r$ & $\\eta$ \\\\",
+        "Benchmark & True energy error & Residual-only & Lifting-only & Full & $\\eta_r$ & $\\eta_{\\mathrm{eff}}$ \\\\",
         "\\midrule",
     ]
     for item in ablation:

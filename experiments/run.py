@@ -52,7 +52,10 @@ def build_benchmark_configs():
     return load_benchmark_configs(CONFIG_PATH)
 
 
-def run_single_experiment(benchmark, config, device: str, seed: int):
+def run_single_experiment(benchmark, config, device: str, seed: int, weights_dir: str | None = None):
+    # Re-seed per benchmark so that every benchmark's network is independent of the run order and
+    # identical to the network trained by experiments/paper_artifacts.py with seed + index.
+    set_reproducibility(seed)
     interior_sampler, boundary_sampler = get_domain_samplers(
         benchmark.domain,
         config.get("sampler"),
@@ -71,6 +74,10 @@ def run_single_experiment(benchmark, config, device: str, seed: int):
     trainer = Trainer(solver, config["training"])
     history = trainer.train()
 
+    if weights_dir is not None:
+        ensure_dir(weights_dir)
+        torch.save(solver.net.state_dict(), os.path.join(weights_dir, f"{benchmark.key}.pt"))
+
     estimator = ValidatedEstimator(
         solver=solver,
         benchmark=benchmark,
@@ -79,7 +86,8 @@ def run_single_experiment(benchmark, config, device: str, seed: int):
         eval_seed=seed,
     )
     result = estimator.evaluate(training_loss=history.total_loss[-1])
-    assert result.effectivity >= 1.0, "Estimator is NOT reliable (η < 1)"
+    # No assertion on the effectivity: in the continuum eta_oplus/true >= 1 for constant a, but the
+    # computed value carries discretisation error and must be reported, not asserted.
 
     return {
         "benchmark": benchmark.name,
@@ -209,6 +217,11 @@ def parse_args():
         help="Path to the reproducibility metadata JSON file.",
     )
     parser.add_argument(
+        "--weights-dir",
+        default=os.path.join(PROJECT_ROOT, "results", "weights"),
+        help="Directory where the trained network weights are saved (one .pt per benchmark).",
+    )
+    parser.add_argument(
         "--figure-dir",
         default=os.path.join(PROJECT_ROOT, "results", "figures"),
         help="Directory for generated figures.",
@@ -237,7 +250,9 @@ def main():
         print("\n" + "=" * 72)
         print(f"Running benchmark: {benchmark.name}")
         print("=" * 72)
-        output = run_single_experiment(benchmark, configs[key], args.device, args.seed + len(results))
+        output = run_single_experiment(
+            benchmark, configs[key], args.device, args.seed + len(results), args.weights_dir
+        )
         if output["metrics"]["effectivity"] > 2.0:
             print(
                 f"WARNING: effectivity is larger than desired for {benchmark.name}: "

@@ -41,6 +41,10 @@ class _UnitSquareHarmonicBenchmark:
     description = "Synthetic harmonic lifting validation benchmark."
 
     @staticmethod
+    def diffusion_coeff(x):
+        return torch.ones((x.shape[0], 1), dtype=x.dtype, device=x.device)
+
+    @staticmethod
     def boundary_condition(x):
         return x[:, 0:1]
 
@@ -65,6 +69,10 @@ class _LShapedHarmonicBenchmark:
     domain = "l_shaped"
     coercivity_constant = 1.0
     description = "Synthetic harmonic lifting validation benchmark on the L-shaped domain."
+
+    @staticmethod
+    def diffusion_coeff(x):
+        return torch.ones((x.shape[0], 1), dtype=x.dtype, device=x.device)
 
     @staticmethod
     def boundary_condition(x):
@@ -114,8 +122,8 @@ def main() -> int:
     )
     result = estimator.evaluate(training_loss=0.0)
     checks = [
-        ("Effectivity >= 1", result.effectivity >= 1.0 - 1e-6, f"{result.effectivity:.6f}"),
-        ("Boundary lifting close to one", abs(result.boundary_lifting_norm - 1.0) < 5e-2, f"{result.boundary_lifting_norm:.6f}"),
+        ("Effectivity == 1 (no residual)", abs(result.effectivity - 1.0) < 1e-8, f"{result.effectivity:.10f}"),
+        ("Boundary lifting close to one", abs(result.boundary_lifting_norm - 1.0) < 1e-8, f"{result.boundary_lifting_norm:.6f}"),
         ("Residual contribution zero", abs(result.residual_contribution) < 1e-12, f"{result.residual_contribution:.3e}"),
         ("True energy near one", abs(result.true_error_energy - 1.0) < 1e-6, f"{result.true_error_energy:.6f}"),
     ]
@@ -135,16 +143,16 @@ def main() -> int:
     )
     lshape_result = lshape_estimator.evaluate(training_loss=0.0)
     checks = [
-        ("L-shaped effectivity >= 1", lshape_result.effectivity >= 1.0 - 1e-6, f"{lshape_result.effectivity:.6f}"),
+        ("L-shaped effectivity == 1 (no residual)", abs(lshape_result.effectivity - 1.0) < 1e-6, f"{lshape_result.effectivity:.10f}"),
         (
             "L-shaped boundary lifting close to sqrt(3)",
-            abs(lshape_result.boundary_lifting_norm - np.sqrt(3.0)) < 5e-2,
+            abs(lshape_result.boundary_lifting_norm - np.sqrt(3.0)) < 1e-8,
             f"{lshape_result.boundary_lifting_norm:.6f}",
         ),
         ("L-shaped residual contribution zero", abs(lshape_result.residual_contribution) < 1e-12, f"{lshape_result.residual_contribution:.3e}"),
         (
             "L-shaped true energy near sqrt(3)",
-            abs(lshape_result.true_error_energy - np.sqrt(3.0)) < 5e-2,
+            abs(lshape_result.true_error_energy - np.sqrt(3.0)) < 1e-6,
             f"{lshape_result.true_error_energy:.6f}",
         ),
     ]

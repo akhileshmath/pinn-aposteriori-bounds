@@ -17,6 +17,7 @@ class BenchmarkProblem:
     exact_gradient: Optional[Callable]
     description: str
     coercivity_constant: float
+    coefficient_upper_bound: float = 1.0  # beta = sup a; used by the variable-coefficient bound
 
 
 def _poisson_problem() -> BenchmarkProblem:
@@ -98,7 +99,8 @@ def _variable_coefficient_problem() -> BenchmarkProblem:
         exact_solution=u,
         exact_gradient=grad_u,
         description="Coercive diffusion with spatially varying coefficient a(x).",
-        coercivity_constant=0.5,
+        coercivity_constant=1.0,  # inf a = 1 (a = 1 + 0.5 sin sin >= 1); the old value 0.5 was valid but not sharp
+        coefficient_upper_bound=1.5,
     )
 
 
