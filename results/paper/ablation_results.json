@@ -1,37 +1,50 @@
 {
+  "metadata": {
+    "entrypoint": "experiments/paper_artifacts.py",
+    "timestamp_utc": "2026-11-02T12:32:01.468985+00:00",
+    "git_commit": "80267974cf922cfa4adb2bcd5e87e38d0bc96b72",
+    "python_version": "3.10.11",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "numpy_version": "2.2.6",
+    "torch_version": "2.11.0+cpu",
+    "seed": 42,
+    "device": "cpu",
+    "config_path": "D:\\Work\\PHD-2026\\Project\\project-2\\pinn-error-bounds\\configs\\validated_benchmarks.json",
+    "source_results": "D:\\Work\\PHD-2026\\Project\\project-2\\pinn-error-bounds\\results\\validated_results.json"
+  },
   "ablation": [
     {
       "benchmark": "Poisson (smooth)",
       "key": "poisson",
       "true_error_energy": 0.0011830053929820822,
-      "residual_only": 3.253523630947579e-05,
-      "lifting_only": 0.0012097774494809286,
-      "full_estimator": 0.0012423126857904045,
-      "eta_residual_only": 0.027502187650609106,
-      "eta_lifting_only": 1.0226305447613897,
-      "eta_full": 1.050132732411999
+      "residual_only": 3.252750860451452e-05,
+      "lifting_only": 0.0011829521089977185,
+      "full_estimator": 0.001215479617602233,
+      "eta_residual_only": 0.02749565538540802,
+      "eta_lifting_only": 0.99995495879843,
+      "eta_full": 1.027450614183838
     },
     {
       "benchmark": "Variable coefficient diffusion",
       "key": "variable_coefficient",
-      "true_error_energy": 0.002983047249813532,
-      "residual_only": 0.00010700403283903353,
-      "lifting_only": 0.0030778316454469746,
-      "full_estimator": 0.003184835678286008,
-      "eta_residual_only": 0.03587071336054844,
-      "eta_lifting_only": 1.0317743527660743,
-      "eta_full": 1.0676450661266226
+      "true_error_energy": 0.002443186447959356,
+      "residual_only": 5.623752626076166e-05,
+      "lifting_only": 0.0024429490407421517,
+      "full_estimator": 0.0024991865670029134,
+      "eta_residual_only": 0.02301810666465239,
+      "eta_lifting_only": 0.9999028288580256,
+      "eta_full": 1.022920935522678
     },
     {
       "benchmark": "L-shaped domain singularity",
       "key": "l_shaped",
-      "true_error_energy": 0.044127876622404846,
-      "residual_only": 0.009293322406338527,
-      "lifting_only": 0.0483180385142151,
-      "full_estimator": 0.05761136092055363,
-      "eta_residual_only": 0.21059980940982034,
-      "eta_lifting_only": 1.0949549856582677,
-      "eta_full": 1.305554795068088
+      "true_error_energy": 0.057497593439033316,
+      "residual_only": 0.0024520102871745057,
+      "lifting_only": 0.059980923549109035,
+      "full_estimator": 0.06243293383628354,
+      "eta_residual_only": 0.04264544201792475,
+      "eta_lifting_only": 1.0431901573882196,
+      "eta_full": 1.0858355994061444
     }
   ]
 }
