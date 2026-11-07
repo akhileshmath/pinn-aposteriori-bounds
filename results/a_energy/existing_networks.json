@@ -1,0 +1,143 @@
+{
+  "poisson": {
+    "levels": [
+      {
+        "n_cells": 32,
+        "n_nodes": 1089,
+        "dual_norm": 3.1109340537535226e-05,
+        "lifting_norm": 0.001183979447674463,
+        "eta": 0.0011843880798050135,
+        "residual_vector_norm": 2.4443611814226515e-05,
+        "eta_over_true": 1.0008884850014024
+      },
+      {
+        "n_cells": 64,
+        "n_nodes": 4225,
+        "dual_norm": 3.215233827244139e-05,
+        "lifting_norm": 0.0011832077198679941,
+        "eta": 0.0011836444910578528,
+        "residual_vector_norm": 1.3816590515743866e-05,
+        "eta_over_true": 1.0002601019339772
+      },
+      {
+        "n_cells": 128,
+        "n_nodes": 16641,
+        "dual_norm": 3.244533337285169e-05,
+        "lifting_norm": 0.0011829716517044574,
+        "eta": 0.0011834165067270473,
+        "residual_vector_norm": 7.383416661486812e-06,
+        "eta_over_true": 1.0000674396678206
+      }
+    ],
+    "alpha": 1.0,
+    "beta": 1.0,
+    "eta_a_finest": 0.0011834165067270473,
+    "unweighted_interval_finest": [
+      0.0011834165067270473,
+      0.0011834165067270473
+    ],
+    "boundary": {
+      "l2": 0.00030752570288300696,
+      "tangential_h1": 0.004324908013793225
+    },
+    "true_error_a": 0.0011833367028928842,
+    "true_error_grad": 0.0011833367028928842,
+    "ref_method": "gauss_mesh",
+    "ref_self_convergence_rel": 1.2643899190925647e-14,
+    "pythagoras_gap_finest": -1.8887598064561752e-10
+  },
+  "variable_coefficient": {
+    "levels": [
+      {
+        "n_cells": 32,
+        "n_nodes": 1089,
+        "dual_norm": 4.8553797287328796e-05,
+        "lifting_norm": 0.002495689502066173,
+        "eta": 0.00249616176598279,
+        "residual_vector_norm": 4.569149667196361e-05,
+        "eta_over_true": 1.0077208747161146
+      },
+      {
+        "n_cells": 64,
+        "n_nodes": 4225,
+        "dual_norm": 5.05153717383888e-05,
+        "lifting_norm": 0.0024814215362804455,
+        "eta": 0.0024819356646573806,
+        "residual_vector_norm": 2.6072120139481643e-05,
+        "eta_over_true": 1.0019776815197403
+      },
+      {
+        "n_cells": 128,
+        "n_nodes": 16641,
+        "dual_norm": 5.1112145430644125e-05,
+        "lifting_norm": 0.002477742008031465,
+        "eta": 0.0024782691358636415,
+        "residual_vector_norm": 1.4194798461122129e-05,
+        "eta_over_true": 1.0004974739252042
+      }
+    ],
+    "alpha": 1.0,
+    "beta": 1.5,
+    "eta_a_finest": 0.0024782691358636415,
+    "unweighted_interval_finest": [
+      0.0020234982760513735,
+      0.0024782691358636415
+    ],
+    "boundary": {
+      "l2": 0.0006750977362194058,
+      "tangential_h1": 0.009781382731768016
+    },
+    "true_error_a": 0.0024770368746067552,
+    "true_error_grad": 0.0024438855298574576,
+    "ref_method": "gauss_mesh",
+    "ref_self_convergence_rel": 4.7446817083046815e-14,
+    "pythagoras_gap_finest": -6.1062316127183085e-09
+  },
+  "l_shaped": {
+    "levels": [
+      {
+        "n_cells": 32,
+        "n_nodes": 833,
+        "dual_norm": 0.000987274131279175,
+        "lifting_norm": 0.0827591189526302,
+        "eta": 0.0827650075818633,
+        "residual_vector_norm": 0.0014437297634026889,
+        "eta_over_true": 1.43652961520999
+      },
+      {
+        "n_cells": 64,
+        "n_nodes": 3201,
+        "dual_norm": 0.0015088752376883601,
+        "lifting_norm": 0.07330332111914063,
+        "eta": 0.07331884881514956,
+        "residual_vector_norm": 0.0019051038932509537,
+        "eta_over_true": 1.2725752193267068
+      },
+      {
+        "n_cells": 128,
+        "n_nodes": 12545,
+        "dual_norm": 0.002085876534699564,
+        "lifting_norm": 0.0649918376515137,
+        "eta": 0.06502530155438516,
+        "residual_vector_norm": 0.002202972859289837,
+        "eta_over_true": 1.1286263863196218
+      }
+    ],
+    "alpha": 1.0,
+    "beta": 1.0,
+    "eta_a_finest": 0.06502530155438516,
+    "unweighted_interval_finest": [
+      0.06502530155438516,
+      0.06502530155438516
+    ],
+    "boundary": {
+      "l2": 0.007731074088987807,
+      "tangential_h1": 0.4118887496400861
+    },
+    "true_error_a": 0.05761455016697642,
+    "true_error_grad": 0.05761455016697642,
+    "ref_method": "graded_polar",
+    "ref_self_convergence_rel": 1.8703544034918172e-09,
+    "pythagoras_gap_finest": -0.0009088534512956821
+  }
+}
