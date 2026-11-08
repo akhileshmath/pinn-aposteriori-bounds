@@ -31,6 +31,7 @@ from .references import (
 )
 
 from .evaluate import evaluate_from_callables
+from .extrapolation import observed_order_and_limit
 
 __all__ = [
     "AEnergyResult",
@@ -50,5 +51,6 @@ __all__ = [
     "residual_vector",
     "triangle_rule",
     "true_error_a_quadrature",
+    "observed_order_and_limit",
     "unit_square_mesh",
 ]

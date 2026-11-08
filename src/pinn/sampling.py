@@ -108,6 +108,23 @@ def l_shaped_boundary_sampler(
     return torch.cat(points, dim=0)[:n]
 
 
+def boundary_tangent(domain: str, x: torch.Tensor, tol: float = 1e-9) -> torch.Tensor:
+    """Unit tangent of the straight boundary edge containing each point (shape (n, 2)).
+
+    Points must lie on the boundary produced by the samplers above.  At a corner (a null set) the
+    horizontal tangent is returned.  The orientation is arbitrary (only tau tau^T is used).
+    """
+    xx, yy = x[:, 0:1], x[:, 1:2]
+    if domain == "unit_square":
+        horizontal = (yy.abs() < tol) | ((yy - 1.0).abs() < tol)
+    elif domain == "l_shaped":
+        horizontal = ((yy.abs() - 1.0).abs() < tol) | ((yy.abs() < tol) & (xx >= -tol))
+    else:
+        raise ValueError(f"Unknown domain '{domain}'")
+    ones, zeros = torch.ones_like(xx), torch.zeros_like(xx)
+    return torch.where(horizontal, torch.cat([ones, zeros], dim=1), torch.cat([zeros, ones], dim=1))
+
+
 def get_domain_samplers(
     domain: str,
     sampler_config: Optional[Dict[str, Dict[str, float]]] = None,

@@ -18,6 +18,7 @@ class TrainingConfig:
     boundary_warmup_weight: float = 10.0
     resample_every: int = 1000
     print_every: int = 1000
+    w_tangent: float = 0.0  # weight of the tangential-derivative boundary penalty (0 = off)
 
 
 class TrainingHistory:
@@ -26,6 +27,7 @@ class TrainingHistory:
         self.total_loss: List[float] = []
         self.residual_loss: List[float] = []
         self.boundary_loss: List[float] = []
+        self.tangential_loss: List[float] = []
         self.time_elapsed: List[float] = []
 
 
@@ -59,9 +61,10 @@ class Trainer:
             )
 
             optimizer.zero_grad()
-            total, residual, boundary = self.solver.compute_total_loss(
-                x_r, x_b, self.config.w_r, boundary_weight
+            terms = self.solver.compute_loss_terms(
+                x_r, x_b, self.config.w_r, boundary_weight, self.config.w_tangent
             )
+            total, residual, boundary = terms["total"], terms["residual"], terms["boundary"]
             total.backward()
             optimizer.step()
             scheduler.step()
@@ -70,6 +73,9 @@ class Trainer:
             history.total_loss.append(total.item())
             history.residual_loss.append(residual.item())
             history.boundary_loss.append(boundary.item())
+            history.tangential_loss.append(
+                terms["tangential"].item() if terms["tangential"] is not None else 0.0
+            )
             history.time_elapsed.append(time.time() - start)
 
             if epoch % self.config.print_every == 0:
@@ -93,19 +99,23 @@ class Trainer:
                 def closure():
                     optimizer_lbfgs.zero_grad()
                     total, _, _ = self.solver.compute_total_loss(
-                        x_r, x_b, self.config.w_r, self.config.w_b
+                        x_r, x_b, self.config.w_r, self.config.w_b, self.config.w_tangent
                     )
                     total.backward()
                     return total
 
                 optimizer_lbfgs.step(closure)
-                total, residual, boundary = self.solver.compute_total_loss(
-                    x_r, x_b, self.config.w_r, self.config.w_b
+                terms = self.solver.compute_loss_terms(
+                    x_r, x_b, self.config.w_r, self.config.w_b, self.config.w_tangent
                 )
+                total, residual, boundary = terms["total"], terms["residual"], terms["boundary"]
                 history.epochs.append(self.config.adam_epochs + step)
                 history.total_loss.append(total.item())
                 history.residual_loss.append(residual.item())
                 history.boundary_loss.append(boundary.item())
+                history.tangential_loss.append(
+                    terms["tangential"].item() if terms["tangential"] is not None else 0.0
+                )
                 history.time_elapsed.append(time.time() - start)
 
                 if step % max(self.config.lbfgs_epochs // 5, 1) == 0:

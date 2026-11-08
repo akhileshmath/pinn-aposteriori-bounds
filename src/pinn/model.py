@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -36,8 +38,18 @@ class PINNNetwork(nn.Module):
         use_fourier: bool = False,
         fourier_dim: int = 64,
         fourier_sigma: float = 1.0,
+        hard_bc: Optional[str] = None,
+        hard_bc_scale: float = 16.0,
     ):
         super().__init__()
+        if hard_bc not in (None, "unit_square_zero"):
+            raise ValueError(f"Unknown hard_bc '{hard_bc}' (use None or 'unit_square_zero')")
+        # hard_bc='unit_square_zero':  uhat(x) = scale * x1 (1-x1) x2 (1-x2) * N(x), which vanishes on the
+        # boundary of the unit square EXACTLY (valid only for homogeneous Dirichlet data g = 0).
+        # scale = 16 normalises the bubble to max 1; it is a constant and does not change the
+        # expressiveness of the ansatz.
+        self.hard_bc = hard_bc
+        self.hard_bc_scale = float(hard_bc_scale)
         if hidden_dims is None:
             hidden_dims = [64, 64, 64, 64]
 
@@ -74,4 +86,8 @@ class PINNNetwork(nn.Module):
         hidden = self.fourier(x) if self.use_fourier else x
         for layer in self.layers[:-1]:
             hidden = self.activation(layer(hidden))
-        return self.layers[-1](hidden)
+        out = self.layers[-1](hidden)
+        if self.hard_bc == "unit_square_zero":
+            bubble = x[:, 0:1] * (1.0 - x[:, 0:1]) * x[:, 1:2] * (1.0 - x[:, 1:2])
+            out = self.hard_bc_scale * bubble * out
+        return out

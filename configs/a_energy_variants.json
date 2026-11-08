@@ -1,0 +1,136 @@
+{
+  "_comment": "Overrides applied on top of configs/validated_benchmarks.json. Every variant is trained in float64 by experiments/run_a.py.",
+  "baseline": {
+    "description": "Soft-BC PINN exactly as in the original benchmarks (w_b = 10), float64.",
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "wb1": {
+    "description": "Boundary weight w_b = 1.",
+    "training": {
+      "w_b": 1.0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "wb100": {
+    "description": "Boundary weight w_b = 100.",
+    "training": {
+      "w_b": 100.0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "tangent_g1": {
+    "description": "Baseline + tangential-derivative boundary penalty, gamma = 1.",
+    "training": {
+      "w_tangent": 1.0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "tangent_g10": {
+    "description": "Baseline + tangential-derivative boundary penalty, gamma = 10.",
+    "training": {
+      "w_tangent": 10.0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "hardbc": {
+    "description": "Hard boundary condition ansatz (unit square, g = 0 only): lifting is identically 0.",
+    "network": {
+      "hard_bc": "unit_square_zero"
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient"
+    ]
+  },
+  "corner_refined": {
+    "description": "L-shape: collocation concentrated near the re-entrant corner (50% interior, 30% boundary).",
+    "sampler": {
+      "interior": {
+        "corner_fraction": 0.5
+      },
+      "boundary": {
+        "corner_fraction": 0.3
+      }
+    },
+    "applies_to": [
+      "l_shaped"
+    ]
+  },
+  "tangent_g01": {
+    "description": "Baseline + tangential penalty, gamma = 0.1 (dose-response below gamma = 1).",
+    "training": {
+      "w_tangent": 0.1
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "tangent_g001": {
+    "description": "Baseline + tangential penalty, gamma = 0.01.",
+    "training": {
+      "w_tangent": 0.01
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "corner_interior_only": {
+    "description": "L-shape: collocation refined near the corner in the INTERIOR only (boundary points uniform) - separates the two factors confounded in 'corner_refined'.",
+    "sampler": {
+      "interior": {
+        "corner_fraction": 0.5
+      }
+    },
+    "applies_to": [
+      "l_shaped"
+    ]
+  },
+  "sparse_bnd_16": {
+    "description": "Only 16 FIXED boundary collocation points (no resampling): the L2 boundary loss is small AT the points but the mismatch between them is free to oscillate.",
+    "training": {
+      "n_boundary": 16,
+      "resample_every": 0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  },
+  "sparse_bnd_64": {
+    "description": "64 FIXED boundary collocation points (no resampling).",
+    "training": {
+      "n_boundary": 64,
+      "resample_every": 0
+    },
+    "applies_to": [
+      "poisson",
+      "variable_coefficient",
+      "l_shaped"
+    ]
+  }
+}

@@ -119,3 +119,10 @@ paper/main.thm
 .env
 .env.*
 *.local
+
+.pytest_tmp/
+__pycache__/
+*.pyc
+phase*_upload.zip
+phase*_summary.txt
+phase*_diagnostics.txt
