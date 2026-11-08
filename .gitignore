@@ -126,3 +126,5 @@ __pycache__/
 phase*_upload.zip
 phase*_summary.txt
 phase*_diagnostics.txt
+
+results/a_quick/
