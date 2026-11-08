@@ -1,0 +1,149 @@
+{
+  "n_runs": 81,
+  "warnings": [
+    "Only 3 seed(s): report mean/sd and per-seed values, avoid significance language."
+  ],
+  "per_benchmark": {
+    "poisson": {
+      "n_runs": 24,
+      "theoremA_max_abs_ratio_deviation_finest": 0.0013313261146125077,
+      "theoremA_max_abs_ratio_deviation_finest_softBC": 0.0008384943261925404,
+      "extrapolated_max_abs_deviation": 8.530195613309921e-05,
+      "reference_selfconvergence_max_rel": 1.738818232012185e-13,
+      "baseline_residual_share_of_squared_error_pct": 0.17831048586237683,
+      "error_factor_baseline_over_variant": {
+        "wb1": 0.24811580059679905,
+        "wb100": 1.6028205604957566,
+        "sparse_bnd_16": 0.0862210982043933,
+        "sparse_bnd_64": 0.7407882997268876,
+        "tangent_g1": 4.8154849279741265,
+        "tangent_g10": 8.290884940299604,
+        "hardbc": 4.419165081783658
+      },
+      "n_seeds_per_variant": {
+        "baseline": 3,
+        "wb1": 3,
+        "wb100": 3,
+        "sparse_bnd_16": 3,
+        "sparse_bnd_64": 3,
+        "tangent_g1": 3,
+        "tangent_g10": 3,
+        "hardbc": 3
+      },
+      "lifting_per_l2_min_max": [
+        1.866502635749786,
+        4.140776540379283
+      ],
+      "dual_over_sqrt_fixed_residual_loss": {
+        "baseline": 0.0319649316253336,
+        "wb1": 0.029693958632892814,
+        "wb100": 0.02893643373916362,
+        "sparse_bnd_16": 0.027995823409728143,
+        "sparse_bnd_64": 0.027960910287737162,
+        "tangent_g1": 0.027631215323819413,
+        "tangent_g10": 0.02971441899248829,
+        "hardbc": 0.050733514201222275
+      }
+    },
+    "variable_coefficient": {
+      "n_runs": 24,
+      "theoremA_max_abs_ratio_deviation_finest": 0.0018839988274120811,
+      "theoremA_max_abs_ratio_deviation_finest_softBC": 0.0016298388567999034,
+      "extrapolated_max_abs_deviation": 0.00014142517157089696,
+      "reference_selfconvergence_max_rel": 1.7484362358287015e-11,
+      "baseline_residual_share_of_squared_error_pct": 0.024107253232159814,
+      "error_factor_baseline_over_variant": {
+        "wb1": 0.4310139240874645,
+        "wb100": 3.4205835224344416,
+        "sparse_bnd_16": 0.17686625699249497,
+        "sparse_bnd_64": 0.8633395812486291,
+        "tangent_g1": 6.490314588451968,
+        "tangent_g10": 18.574657338478747,
+        "hardbc": 14.54026112449903
+      },
+      "n_seeds_per_variant": {
+        "baseline": 3,
+        "wb1": 3,
+        "wb100": 3,
+        "sparse_bnd_16": 3,
+        "sparse_bnd_64": 3,
+        "tangent_g1": 3,
+        "tangent_g10": 3,
+        "hardbc": 3
+      },
+      "lifting_per_l2_min_max": [
+        2.2214770114359297,
+        4.078897809552426
+      ],
+      "dual_over_sqrt_fixed_residual_loss": {
+        "baseline": 0.023027670311076397,
+        "wb1": 0.023044807089306993,
+        "wb100": 0.024706524406623447,
+        "sparse_bnd_16": 0.022596162441590434,
+        "sparse_bnd_64": 0.021416659316237773,
+        "tangent_g1": 0.024135531730299777,
+        "tangent_g10": 0.026141568652299833,
+        "hardbc": 0.04159591959389703
+      }
+    },
+    "l_shaped": {
+      "n_runs": 33,
+      "theoremA_max_abs_ratio_deviation_finest": 0.060818123025626614,
+      "theoremA_max_abs_ratio_deviation_finest_softBC": 0.060818123025626614,
+      "extrapolated_max_abs_deviation": 0.026499348839470804,
+      "reference_selfconvergence_max_rel": 1.976219428794842e-05,
+      "baseline_residual_share_of_squared_error_pct": 8.35621937994179,
+      "error_factor_baseline_over_variant": {
+        "wb1": 0.5683556342365389,
+        "wb100": 1.229317780296829,
+        "sparse_bnd_16": 0.1069076617882286,
+        "sparse_bnd_64": 0.316726681972076,
+        "tangent_g001": 1.1447823208222063,
+        "tangent_g01": 0.665720525813894,
+        "tangent_g1": 0.5339288708997366,
+        "tangent_g10": 0.29219536364470333,
+        "corner_refined": 0.5766247198843696,
+        "corner_interior_only": 0.48718580148062934
+      },
+      "n_seeds_per_variant": {
+        "baseline": 3,
+        "wb1": 3,
+        "wb100": 3,
+        "sparse_bnd_16": 3,
+        "sparse_bnd_64": 3,
+        "tangent_g001": 3,
+        "tangent_g01": 3,
+        "tangent_g1": 3,
+        "tangent_g10": 3,
+        "corner_refined": 3,
+        "corner_interior_only": 3
+      },
+      "lifting_per_l2_min_max": [
+        2.051766785704832,
+        11.346848703178209
+      ],
+      "dual_over_sqrt_fixed_residual_loss": {
+        "baseline": 0.020236259519087318,
+        "wb1": 0.019866204287868325,
+        "wb100": 0.019602280268778895,
+        "sparse_bnd_16": 0.05848939580094753,
+        "sparse_bnd_64": 0.03374679010268856,
+        "tangent_g001": 0.0231129789363226,
+        "tangent_g01": 0.027461558447338493,
+        "tangent_g1": 0.02900213872854043,
+        "tangent_g10": 0.028951447827408033,
+        "corner_refined": 0.10997342568031489,
+        "corner_interior_only": 0.09215772423453233
+      }
+    }
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "notes": [
+    "Factors are ratios of seed means; with few seeds they are descriptive, not tested.",
+    "All analyses in a_claims.json were chosen after seeing the data (exploratory) unless pre-registered in the manuscript plan."
+  ]
+}
